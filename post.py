@@ -12,10 +12,11 @@ def put(name,data):
   b=data.encode() if isinstance(data,str) else data
   base,ext=name.rsplit('.',1);n=f'assets/{base}.{h8(b)}.{ext}';open(f'{D}/{n}','wb').write(b);A[name]=n;return n
 put('poses.json',PJ);put('costumes.json',CJ);put('anime.json',AJ);put('portraits.json',RJ);put('depths.json',DJ)
+put('expressions.json',EXJ);put('hair.json',HAJ);put('dynasties.json',DYJ);put('scenes.json',SCJ);put('lights.json',LIJ);put('props.json',PRJ);put('furniture.json',FUJ)
 for f in ['style.css','zip.js','extras.js','studio.js']: put(f,open(f'src/{f}','rb').read())
 app=open('src/app.js').read()
 if AH: app=app.replace("const AH='';",f"const AH='{AH}/';")
-app=app.replace("'poses.json'","'/"+A['poses.json']+"'").replace("'costumes.json'","'/"+A['costumes.json']+"'").replace("'anime.json'","'/"+A['anime.json']+"'").replace("'portraits.json'","'/"+A['portraits.json']+"'").replace("'depths.json'","'/"+A['depths.json']+"'")
+app=app.replace("'poses.json'","'/"+A['poses.json']+"'").replace("'costumes.json'","'/"+A['costumes.json']+"'").replace("'anime.json'","'/"+A['anime.json']+"'").replace("'portraits.json'","'/"+A['portraits.json']+"'").replace("'depths.json'","'/"+A['depths.json']+"'").replace("'expressions.json'","'/"+A['expressions.json']+"'").replace("'hair.json'","'/"+A['hair.json']+"'").replace("'dynasties.json'","'/"+A['dynasties.json']+"'").replace("'scenes.json'","'/"+A['scenes.json']+"'").replace("'lights.json'","'/"+A['lights.json']+"'").replace("'props.json'","'/"+A['props.json']+"'").replace("'furniture.json'","'/"+A['furniture.json']+"'")
 put('app.js',app)
 VER='posewear-v10-'+h8(''.join(A.values()))
 idx=open('src/index.html').read()
@@ -103,6 +104,12 @@ open(f'{D}/_headers','w').write(f'''/*
 {IMM}/c/*
 {IMM}/a/*
 {IMM}/r/*
+{IMM}/e/*
+{IMM}/y/*
+{IMM}/s/*
+{IMM}/l/*
+{IMM}/t/*
+{IMM}/f/*
 {IMM}/o/*
 {IMM}/icon-*
   Cache-Control: public, max-age=86400
