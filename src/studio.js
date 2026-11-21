@@ -5,7 +5,7 @@ const LS=k=>{try{return JSON.parse(localStorage[k]||'null')}catch(e){return null
 const PROV={openai:{name:'OpenAI',base:'https://api.openai.com/v1',model:'gpt-image-1',models:['gpt-image-1','gpt-image-1-mini','gpt-image-2','dall-e-2']},
  gemini:{name:'Gemini',base:'https://generativelanguage.googleapis.com/v1beta',model:'gemini-2.5-flash-image',models:['gemini-2.5-flash-image','gemini-3-pro-image-preview','gemini-3.1-flash-image']},
  seedream:{name:'豆包 Seedream',base:'https://ark.cn-beijing.volces.com/api/v3',model:'doubao-seedream-4-0-250828',models:['doubao-seedream-4-0-250828','doubao-seedream-4-5-251128','doubao-seedream-5-0-flash-260915']},
- custom:{name:'自定义中转',base:'',model:'gpt-image-1',models:['gpt-image-1','gpt-image-2','gemini-2.5-flash-image','flux-kontext-pro','qwen-image-edit','doubao-seedream-4-0-250828']}};
+ custom:{name:'自定义中转',base:'',model:'gpt-image-1',models:['gpt-image-1','gpt-image-2','grok-imagine-image-2.0','gemini-2.5-flash-image','flux-kontext-pro','qwen-image-edit','doubao-seedream-4-0-250828']}};
 const cfg=Object.assign({prov:'openai',base:'',key:'',model:'',field:'image[]',proto:'edits',proxy:false},LS('wbCfg')||{});
 // ---------- 预设 ----------
 const CHARS=[['asia','东亚女性','an adult East Asian woman in her mid-20s, long black hair, natural makeup, slim build','一位二十多岁的成年东亚女性，黑色长发，自然淡妆，身材纤细'],
@@ -141,7 +141,7 @@ $('#cfClr').onclick=()=>{cfg.key='';$('#cfKey').value='';SV('wbCfg',cfg);render(
 function msg(t,bad){const m=$('#cfMsg');m.textContent=t;m.className='fine '+(bad?'bad':'good')}
 $('#cfTest').onclick=async()=>{const o=cfgRead();if(!o.key)return msg('请先填写 API Key',1);if(o.prov=='custom'&&!o.base)return msg('请填写 Base URL',1);const old=Object.assign({},cfg);Object.assign(cfg,o);msg('正在连接…');
  try{const g=cfg.prov=='gemini',url=g?`${root()}/models/${encodeURIComponent(modelOf())}`:`${root()}/models`;const r=await call(url,{method:'GET',headers:auth()});const j=await r.json().catch(()=>null);
-  if(!r.ok){if(cfg.prov=='seedream'&&r.status==404)return msg('地址可达、密钥已被接受（方舟不提供模型列表接口，可直接生成测试）');throw await apiErr(r,j)}
+  if(!r.ok){if(cfg.prov=='seedream'&&r.status==404){if((r.headers.get('content-type')||'').includes('text/html')){const e=Error('');e.zh='本站代理未生效：/api/proxy 返回的是网站静态页面而不是接口响应，Seedream 暂时连不上，请稍后再试或联系站长';throw e}return msg('地址可达、密钥已被接受（方舟不提供模型列表接口，可直接生成测试）')}throw await apiErr(r,j)}
   if(g)msg(`连接成功：模型 ${j&&j.displayName||modelOf()} 可用`);else{const ids=(j&&j.data||[]).map(m=>m.id),has=ids.includes(modelOf());msg(`连接成功：共 ${ids.length} 个模型`+(ids.length?(has?`，包含 ${modelOf()}`:`，但未找到 ${modelOf()}（中转可能不列出，可直接尝试）`):''))}}
  catch(e){msg(nice(e),1)}finally{Object.assign(cfg,old)}};
 // ---------- 请求 ----------
@@ -158,7 +158,7 @@ function safeErr(raw,j,rid){const t=String(raw||'')+' '+JSON.stringify(j||'');if
  let r=String(raw||'').trim();if(cfg.key)r=r.split(cfg.key).join('***');e.raw=r||t.slice(0,600);e.zh='被服务商的安全审核拦下了';return e}
 async function apiErr(r,j){if(j===undefined)j=await r.json().catch(()=>null);const raw=(j&&(j.error&&(j.error.message||j.error.status||j.error)||j.message))||r.statusText||'';{const se=safeErr(typeof raw=='string'?raw:JSON.stringify(raw),j,(j&&j.error&&j.error.request_id)||r.headers.get('x-request-id'));if(se){se.status=r.status;return se}}
  const m={400:'请求参数有误：常见原因是模型不支持参考图、画幅尺寸不对或图片格式不支持，可换个模型或画幅再试',401:'密钥无效或已过期，请检查 API Key',403:'没有权限：密钥无此模型权限、账户未验证，或所在地区不受支持',404:'地址或模型不存在：请检查 Base URL 和模型名',413:'图片太大，请换一张更小的照片',429:'请求过于频繁或额度已用完，请稍后再试或检查账户余额',500:'服务商内部错误，请稍后重试',502:'网关错误（中转服务不可用）',503:'服务暂时不可用，请稍后重试',504:'服务商响应超时，请重试'}[r.status]||('请求失败（HTTP '+r.status+'）');
- let t=String(typeof raw=='string'?raw:JSON.stringify(raw));if(cfg.key)t=t.split(cfg.key).join('***');const bad=/API_KEY_INVALID|API key not valid|invalid api key|Incorrect API key|AuthenticationError|InvalidApiKey/i.test(t+' '+JSON.stringify(j||''));const e=Error(t);e.status=r.status;e.zh=(bad?'密钥无效或已过期，请检查 API Key':m)+(t?`\n服务商返回：${t.slice(0,300)}`:'');return e}
+ let t=String(typeof raw=='string'?raw:JSON.stringify(raw));if(cfg.key)t=t.split(cfg.key).join('***');const bad=/API_KEY_INVALID|API key not valid|invalid api key|Incorrect API key|AuthenticationError|InvalidApiKey/i.test(t+' '+JSON.stringify(j||''));const ans=!bad&&t.match(/Argument not supported:\s*(\w+)/i);const e=Error(t);e.status=r.status;e.zh=(bad?'密钥无效或已过期，请检查 API Key':ans?`该服务商不支持 ${ans[1]} 参数：当前接口协议与它的规格对不上，请检查「接口协议」设置（xAI 请改选 xAI 协议）`:m)+(t?`\n服务商返回：${t.slice(0,300)}`:'');return e}
 function nice(e){if(e.name=='AbortError')return'已取消';if(e instanceof TypeError)return'无法连接到服务商：网络不通，或该地址不允许浏览器跨域访问（CORS）。\n可在 API 设置中开启「通过本站代理转发」。';return e.zh||e.message||String(e)}
 const AR={auto:null,'2:3':'1024x1536','3:4':'1024x1536','9:16':'1024x1536','1:1':'1024x1024','4:3':'1536x1024','16:9':'1536x1024'};
 const SD={auto:'1728x2304','2:3':'1664x2496','3:4':'1728x2304','9:16':'1440x2560','1:1':'2048x2048','4:3':'2304x1728','16:9':'2560x1440'};
@@ -173,12 +173,16 @@ async function genOnce(imgs,prompt,sig){const ar=$('#wbAR').value,m=modelOf(),P=
  const json=async(withImgs,extra)=>{const body=Object.assign({model:m,prompt,n:1},extra);if(withImgs&&imgs.length)body.image=await Promise.all(imgs.map(dataURL));
   const r=await call(`${root()}/images/generations`,{method:'POST',signal:sig,headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify(body)});const j=await r.json().catch(()=>null);if(!r.ok)throw await apiErr(r,j);return openaiData(j)};
  if(P=='seedream'){const ex={size:SD[ar]||SD.auto,response_format:'b64_json',watermark:false,sequential_image_generation:'disabled'};try{return{blob:await json(true,ex)}}catch(e){if(!e.safe&&e.status==400&&/image|参考/i.test(e.message)){warn='该模型没有接收参考图，结果只按文字生成，人物与服装可能对不齐。';return{blob:await json(false,ex),warn}}throw e}}
+ if(P=='xai'){const body={model:m,prompt,n:1,response_format:'b64_json'};if(ar!='auto')body.aspect_ratio=ar;let used=imgs;
+  if(imgs.length>5){used=imgs.slice(0,5);warn='xAI 参考图最多 5 张，已只发送前 5 张。'}
+  if(used.length){const us=await Promise.all(used.map(dataURL));if(us.length==1)body.image={url:us[0]};else body.images=us.map(u=>({url:u}))}
+  const r=await call(`${root()}/images/${used.length?'edits':'generations'}`,{method:'POST',signal:sig,headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify(body)});const j=await r.json().catch(()=>null);if(!r.ok)throw await apiErr(r,j);return{blob:await openaiData(j),warn}}
  const sz=AR[ar]||(/^gpt-image/.test(m)?'auto':'1024x1024');
  if(P=='json')return{blob:await json(true,{size:sz})};
  const edits=async field=>{const fd=new FormData();fd.append('model',m);fd.append('prompt',prompt);const one=/^dall-e-2$/.test(m);(one?imgs.slice(0,1):imgs).forEach((b,i)=>fd.append(field,b,`ref-${i+1}.jpg`));fd.append('n','1');fd.append('size',one&&sz=='auto'?'1024x1024':sz);
   const r=await call(`${root()}/images/edits`,{method:'POST',signal:sig,headers:auth(),body:fd});const j=await r.json().catch(()=>null);if(!r.ok)throw await apiErr(r,j);return openaiData(j)};
  const f0=cfg.prov=='custom'?cfg.field:'image[]';
- try{return{blob:await edits(f0)}}catch(e){if(e.name=='AbortError'||e.safe)throw e;
+ try{return{blob:await edits(f0)}}catch(e){if(e.name=='AbortError'||e.safe)throw e;if(/Argument not supported/i.test(e.message))throw e;
   if(e.status==400&&/image/i.test(e.message)&&!/safety|moderation|reject/i.test(e.message)){try{return{blob:await edits(f0=='image[]'?'image':'image[]'),warn:'已自动改用另一种图片字段名重试成功。'}}catch(x){}}
   if([404,405,415,501].includes(e.status)||/edits|not supported|unsupported|no such|invalid url/i.test(e.message)){try{return{blob:await json(true,{size:sz}),warn:'该接口不支持 images/edits，已自动改用 images/generations（JSON 多图）。'}}catch(x){if(x.name=='AbortError')throw x;return{blob:await json(false,{size:sz}),warn:'该接口不支持参考图，结果只按文字生成，人物与服装可能对不齐。'}}}
   throw e}}
