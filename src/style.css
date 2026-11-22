@@ -539,6 +539,10 @@ button:active:not(:disabled){transform:scale(.97)}.tabs button:active,.chip:acti
 #wbSentD{margin:8px 2px 0;font-size:12px;color:var(--tx2)}#wbSentD summary{cursor:pointer;width:max-content}
 #wbSentD pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:160px;overflow:auto;background:var(--sf);border-radius:10px;padding:8px 10px;margin:6px 0 0;font-size:11.5px}
 #wbHist em{position:absolute;left:4px;top:4px;font-style:normal;font-size:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:0 4px}
+.hl button.hist-more{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;font-size:11px;color:var(--mu);text-align:center;background:var(--card);border:1px dashed var(--line);cursor:pointer}
+.hl button.hist-more:hover{color:var(--tx);border-color:var(--pri);transform:none}
+.hl button.hist-more b{font-size:12px;display:block;color:var(--tx)}
+.hl button.hist-more small{font-size:10px;color:var(--mu);display:block}
 .grid:empty{min-height:0}
 
 .ssr .ssl{display:block;height:100%}.ssr .ph{cursor:pointer}.ssr h3 a{color:inherit;text-decoration:none}

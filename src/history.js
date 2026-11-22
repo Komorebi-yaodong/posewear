@@ -224,20 +224,10 @@
             h: 1024
           }];
         }
-        if (r.prompt) {
-          const ex = $('#wbExtra');
-          if (ex) ex.value = r.orig || r.prompt;
-        }
-        if (r.neutral != null && $('#wbNeutral')) {
-          $('#wbNeutral').checked = !!r.neutral;
-        }
-        if (r.prov && WB._cfg) {
-          WB._cfg.prov = r.prov;
-          if (r.model) WB._cfg.model = r.model;
-        }
       }
+      A.lbClose();
       A.setTab('studio');
-      toast('已载入生成设置，可在工作台调整或直接生成');
+      toast('已载入照片，可在工作台调整或直接生成');
     }
   }
 
@@ -344,7 +334,7 @@
         ${r.mode != 'gen' && r.after ? '<button data-hlb="person">用作人物照片</button>' : ''}
         <button data-hlb="del" class="ghost" style="color:var(--err,#e53e3e)">删除此记录</button>
       </div>
-      <p class="mu" style="margin-top:22px;line-height:2.1"><kbd>←</kbd><kbd>→</kbd>切换记录　<kbd>Esc</kbd>关闭</p>
+      <p class="mu" style="margin-top:22px;line-height:2.1"><kbd>←</kbd><kbd>→</kbd>切换记录　<kbd>C</kbd>复制提示词　<kbd>Esc</kbd>关闭</p>
     `;
 
     const slider = side.querySelector('.hlb-cmp input[type=range]');
@@ -386,15 +376,32 @@
     }
   }, true);
 
-  // Intercept keyboard arrow keys when in history view
+  // Intercept keyboard shortcuts when in history lightbox view
   addEventListener('keydown', e => {
     if (A.st.tab == 'history' && !$('#lb')?.hidden) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const ae = document.activeElement;
+      if (ae && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return;
+      const k = (e.key || '').toLowerCase();
       if (e.key == 'ArrowLeft') {
+        e.preventDefault();
         e.stopImmediatePropagation();
         stepLb(-1);
       } else if (e.key == 'ArrowRight') {
+        e.preventDefault();
         e.stopImmediatePropagation();
         stepLb(1);
+      } else if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      } else if (k == 'c') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const r = L[curIndex];
+        if (r?.prompt) A.copy(r.prompt, '提示词');
+      } else if (k == 'f' || k == 'a' || k == 's') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
       }
     }
   }, true);
