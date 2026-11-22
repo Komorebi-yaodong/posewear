@@ -145,10 +145,10 @@ with ProcessPoolExecutor() as ex: list(ex.map(cv,pd)); list(ex.map(cm,cd)); list
 for _sub,_items in NEWMODS: _cnew(_sub,_items)
 # 深度姿势：只解析素材包里的文本，热链包不复制图片（见 depthpack.py）
 _dc=depthpack.catalog(); DJ=J(_dc['payload']); DEPTH_ORIGINS=_dc['origins']
-if AHOST:
-  # 图片自存模式：深度图已全量存入图片域名下的 d/ 前缀（上游 /thumbs/→/d/thumbs/、/img/→/d/img/），
-  # 条目地址改走自存，不再热链原站（原站不可用时前端会整批找不到图）；署名用的裸域名链接不在替换范围内。
-  DJ=DJ.replace('https://ai-pose-depth-gallery.pages.dev/thumbs/',AHOST+'/d/thumbs/').replace('https://ai-pose-depth-gallery.pages.dev/img/',AHOST+'/d/img/')
+# if AHOST:
+#   # 图片自存模式：深度图已全量存入图片域名下的 d/ 前缀（上游 /thumbs/→/d/thumbs/、/img/→/d/img/），
+#   # 条目地址改走自存，不再热链原站（原站不可用时前端会整批找不到图）；署名用的裸域名链接不在替换范围内。
+#   DJ=DJ.replace('https://ai-pose-depth-gallery.pages.dev/thumbs/',AHOST+'/d/thumbs/').replace('https://ai-pose-depth-gallery.pages.dev/img/',AHOST+'/d/img/')
 for src,rel in _dc['copies']:
   dest=f'{D}/{rel}'; os.makedirs(os.path.dirname(dest),exist_ok=True); shutil.copyfile(src,dest)
 exec(open('post.py').read())
