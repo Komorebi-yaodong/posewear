@@ -30,9 +30,29 @@ function base(){return(st.tab=='fav'?[...st.fav].reverse().map(k=>ITEMS[k]):st.t
 function val(it,key){if(key=='ang')return it.angles.map(a=>a.zh);if(key=='type')return[TL(it)];
  if(key=='col'){if(!it.kw)return[];if(!it._c){const w=' '+it.kw+' ';it._c=Object.keys(COLS).filter(c=>w.includes(' '+COLS[c]+' '))}return it._c}
  if(key=='item'){if(!it.kw)return[];if(!it._i){const e=' '+it.en.replace(/,/g,' ')+' ';it._i=Object.keys(ITEMK).filter(z=>e.includes(' '+ITEMK[z]+' '))}return it._i}return it[key]?[it[key]]:[]}
-function drawFilters(){const b=base();const rows=FDEF[st.tab].map(([key,lab])=>{const c={};b.forEach(it=>val(it,key).forEach(v=>c[v]=(c[v]||0)+1));const ent=Object.entries(c).sort((a,b)=>b[1]-a[1]);if(ent.length<2&&!st.f[key])return'';
+function drawFilters(){
+ const filters = $('#filters');
+ const positions = new Map();
+ let focusedChip;
+ if (filters.dataset.tab === st.tab) {
+  for (const row of filters.querySelectorAll('.frow')) {
+   positions.set(row.getAttribute('aria-label'), row.scrollLeft);
+  }
+  const active = document.activeElement;
+  if (filters.contains(active) && active.matches('.chip')) focusedChip = active.dataset;
+ }
+ const b=base();const rows=FDEF[st.tab].map(([key,lab])=>{const c={};b.forEach(it=>val(it,key).forEach(v=>c[v]=(c[v]||0)+1));const ent=Object.entries(c).sort((a,b)=>b[1]-a[1]);if(ent.length<2&&!st.f[key])return'';
  return `<div class="frow" role="group" aria-label="${lab}"><label>${lab}</label><button class="chip ${!st.f[key]?'on':''}" data-k="${key}" data-v="" aria-pressed="${!st.f[key]}">全部</button>${ent.map(([v,n])=>`<button class="chip ${st.f[key]==v?'on':''}" data-k="${key}" data-v="${esc(v)}" aria-pressed="${st.f[key]==v}">${esc(v)}<i>${n}</i></button>`).join('')}</div>`}).join('');
- $('#filters').innerHTML=`<div class="dh"><b>筛选</b><button class="sm pri" data-done>完成</button></div>`+rows;
+ filters.innerHTML=`<div class="dh"><b>筛选</b><button class="sm pri" data-done>完成</button></div>`+rows;
+ filters.dataset.tab = st.tab;
+ for (const row of filters.querySelectorAll('.frow')) {
+  row.scrollLeft = positions.get(row.getAttribute('aria-label')) ?? 0;
+ }
+ if (focusedChip) {
+  const replacement = [...filters.querySelectorAll('.chip')].find(chip =>
+   chip.dataset.k === focusedChip.k && chip.dataset.v === focusedChip.v);
+  replacement?.focus({preventScroll:true});
+ }
  const act=Object.entries(st.f).filter(e=>e[1]);$('#active').innerHTML=act.map(([k,v])=>`<button data-k="${k}" title="移除此条件">${FLAB[k]}：${esc(v)} ✕</button>`).join('');$('#fN').textContent=act.length||'';$('#clearAll').hidden=!(act.length||st.q)}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
 function apply(){const q=st.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
@@ -83,6 +103,21 @@ grid.onclick=e=>{if(e.target.closest('a.miss'))return;const a=e.target.closest('
  ({open:()=>lbOpen(st.list.indexOf(it),c),fav:()=>toggleFav(k),unrec:()=>unRec(k),sel:()=>toggleSel(k),cpen:()=>copy(prompt(it,'en'),'英文提示词'),cpzh:()=>copy(prompt(it,'zh'),'中文描述'),try:()=>window.WB&&WB.pick(it),ang:()=>setAng(it,+a.dataset.i)})[a.dataset.a]()};
 function viewT(fn){if(document.startViewTransition&&!RM){try{const v=document.startViewTransition(fn);v.ready.catch(()=>{});v.finished.catch(()=>{});return v.updateCallbackDone.catch(()=>{})}catch(e){}}fn();grid.classList.add('fade');requestAnimationFrame(()=>requestAnimationFrame(()=>grid.classList.remove('fade')));return Promise.resolve()}
 function drawer(o){$('#filters').classList.toggle('open',o);$('#fBtn').classList.toggle('on',o)}
+function scrollHorizontal(event) {
+ const mode = event.deltaMode;
+ if (!event.cancelable || event.ctrlKey || event.shiftKey || event.deltaX || !event.deltaY) return;
+
+ const row = event.target.closest('.tabs, .frow');
+ if (!row || row.scrollWidth <= row.clientWidth) return;
+
+ const start = row.scrollLeft;
+ const unit = mode === WheelEvent.DOM_DELTA_LINE ? 16
+  : mode === WheelEvent.DOM_DELTA_PAGE ? row.clientWidth : 1;
+ row.scrollLeft += event.deltaY * unit;
+ if (row.scrollLeft !== start) event.preventDefault();
+}
+$('.tabs').addEventListener('wheel', scrollHorizontal, {passive:false});
+$('#filters').addEventListener('wheel', scrollHorizontal, {passive:false});
 $('#fBtn').onclick=()=>drawer(!$('#filters').classList.contains('open'));$('#drawerBg').onclick=()=>drawer(false);
 $('#filters').onclick=e=>{if(e.target.closest('[data-done]'))return drawer(false);const b=e.target.closest('.chip');if(!b)return;st.f[b.dataset.k]=b.dataset.v;viewT(()=>{drawFilters();apply()})};
 $('#active').onclick=e=>{const b=e.target.closest('button');if(b){st.f[b.dataset.k]='';viewT(()=>{drawFilters();apply()})}};
@@ -97,10 +132,19 @@ function setLang(l,quiet){st.lang=l;SV('lang',l);document.documentElement.datase
 $$('button[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 // 标签页
 function moveInd(){const b=$('.tabs button.on'),ind=$('.ind');if(!b)return;ind.style.width=b.offsetWidth+'px';ind.style.transform=`translateX(${b.offsetLeft}px)`}
-async function setTab(t,openId){$('#porNote').hidden=t!='portrait';$('#depthNote').hidden=t!='depth';const sn=$('#srcNote');if(sn){sn.hidden=!NOTES[t];if(NOTES[t])sn.innerHTML=NOTES[t]}document.body.classList.toggle('depth',t=='depth');if(t=='studio'){st.tab=t;$$('.tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.tab==t);b.setAttribute('aria-selected',b.dataset.tab==t)});moveInd();document.title='试穿 · 衣姿 PoseWear';history.replaceState(null,'','#studio');document.body.classList.add('studio');$('#studio').hidden=false;$('#tray').hidden=true;scrollTo({top:0});window.WB&&WB.show();return}
+function selectTab(tab) {
+ for (const button of $$('.tabs button')) {
+  const selected = button.dataset.tab === tab;
+  button.classList.toggle('on', selected);
+  button.setAttribute('aria-selected', selected);
+ }
+ moveInd();
+ $('.tabs button.on')?.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+async function setTab(t,openId){$('#porNote').hidden=t!='portrait';$('#depthNote').hidden=t!='depth';const sn=$('#srcNote');if(sn){sn.hidden=!NOTES[t];if(NOTES[t])sn.innerHTML=NOTES[t]}document.body.classList.toggle('depth',t=='depth');if(t=='studio'){st.tab=t;selectTab(t);document.title='试穿 · 衣姿 PoseWear';history.replaceState(null,'','#studio');document.body.classList.add('studio');$('#studio').hidden=false;$('#tray').hidden=true;scrollTo({top:0});window.WB&&WB.show();return}
  if(document.body.classList.contains('studio')){document.body.classList.remove('studio');$('#studio').hidden=true;tray()}
  const changed=st.tab!=t;st.tab=t;if(changed)grid.classList.add('gbusy');st.f={};st.q='';$('#q').value='';$('#qx').hidden=true;
- $$('.tabs button').forEach(b=>{b.classList.toggle('on',b.dataset.tab==t);b.setAttribute('aria-selected',b.dataset.tab==t)});moveInd();
+ selectTab(t);
  document.title=TNAME[t]+' · 衣姿 PoseWear';if(!openId)history.replaceState(null,'','#'+t);
  $('#rand').hidden=t=='fav'||t=='recent';$('#favTools').hidden=t!='fav';$('#clrRec').hidden=t!='recent';$('#sort').hidden=t=='recent';$('#porNote').hidden=t!='portrait';$('#depthNote').hidden=t!='depth';$('#q').placeholder=t=='depth'?'搜姿势名、系列、分类':(innerWidth<=760?'搜索':'搜姿势、颜色、单品');$('#sort option[value=rank]').hidden=t!='portrait';if(t!='portrait'&&st.sort=='rank'){st.sort='def';$('#sort').value='def'}
  document.body.classList.toggle('compact',t=='fav'||t=='recent');
@@ -113,7 +157,8 @@ $('.tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const t=b
 function theme(){const go=()=>{const t=document.documentElement.dataset.theme=document.documentElement.dataset.theme=='dark'?'light':'dark';SV('theme',t);localStorage.theme=t;$('meta[name=theme-color]').content=t=='dark'?'#111111':'#ffffff'};if(document.startViewTransition&&!RM){const v=document.startViewTransition(go);v.ready.catch(()=>{});v.finished.catch(()=>{})}else go()}
 $('#theme').onclick=theme;$('#help').onclick=()=>$('#helpBox').hidden=false;$('#helpBox').onclick=e=>{if(e.target.id=='helpBox'||e.target.dataset.close!=null)$('#helpBox').hidden=true};
 // 滚动
-const hdr=()=>document.documentElement.style.setProperty('--hdr',$('#top').offsetHeight+'px');$('#top').addEventListener('transitionend',hdr);
+const hdr=()=>document.documentElement.style.setProperty('--hdr',$('#top').offsetHeight+'px');
+new ResizeObserver(hdr).observe($('#top'));
 let sc=false;addEventListener('scroll',()=>{const s=scrollY>24;if(s!=sc){sc=s;document.body.classList.toggle('scrolled',s);setTimeout(hdr,420)}$('#toTop').classList.toggle('on',scrollY>900)},{passive:true});
 $('#toTop').onclick=()=>scrollTo({top:0,behavior:RM?'auto':'smooth'});
 // 收藏导入导出 / 最近
