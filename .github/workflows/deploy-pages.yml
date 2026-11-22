@@ -47,6 +47,7 @@ jobs:
           test -n "$POSEWEAR_SITE" || { echo "Missing POSEWEAR_SITE"; exit 1; }
           test -n "$POSEWEAR_ASSET_HOST" || { echo "Missing POSEWEAR_ASSET_HOST"; exit 1; }
           python scripts/fetch-assets.py
+          python scripts/fetch-shisei.py
           python build.py
 
       - name: Check output and Pages limits
