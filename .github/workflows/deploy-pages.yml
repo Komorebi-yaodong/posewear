@@ -1,0 +1,80 @@
+name: Deploy PoseWear to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: posewear-pages-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      POSEWEAR_SITE: ${{ vars.POSEWEAR_SITE }}
+      POSEWEAR_ASSET_HOST: ${{ vars.POSEWEAR_ASSET_HOST }}
+      PYTHONUTF8: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install Pillow
+        run: python -m pip install Pillow
+
+      - name: Download assets and build
+        run: |
+          test -n "$POSEWEAR_SITE" || { echo "Missing POSEWEAR_SITE"; exit 1; }
+          test -n "$POSEWEAR_ASSET_HOST" || { echo "Missing POSEWEAR_ASSET_HOST"; exit 1; }
+          python scripts/fetch-assets.py
+          python build.py
+
+      - name: Check output and Pages limits
+        run: |
+          test -s dist/index.html
+          test -s dist/_headers
+          python - <<'PY'
+          from pathlib import Path
+
+          for directory in ("dist", "dist-assets"):
+              files = [p for p in Path(directory).rglob("*") if p.is_file()]
+              print(f"{directory}: {len(files)} files", flush=True)
+              if not files or len(files) > 20_000:
+                  raise SystemExit(f"{directory}: empty or over the Pages Free file limit")
+              for path in files:
+                  if path.stat().st_size > 25 * 1024 * 1024:
+                      raise SystemExit(f"{path}: exceeds the 25 MiB Pages file limit")
+          PY
+
+      - name: Deploy media assets
+        working-directory: dist-assets
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@4 pages deploy . --project-name=komo-posewear-assets --branch=main
+
+      - name: Deploy site and Pages Functions
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@4 pages deploy dist --project-name=komo-posewear --branch=main
