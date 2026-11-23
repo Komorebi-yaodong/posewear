@@ -23,10 +23,10 @@
 
 ## 機能
 
-- **5 つのギャラリー**：ポーズ（多角度の線画）、深度ポーズ（ホットリンクされた深度マップ）、服装（季節と種類で分類）、アニメ服（アニメ風の着こなし）、人物（顔のリファレンス、CC0）。すべての画像に中国語の説明と、コピーできる英語のプロンプトが付いています。
+- **12 のギャラリー**：ポーズ（多角度の線画）、深度ポーズ、服装（季節と種類で分類）、アニメ服（アニメ風の着こなし、CharaDB 統合分を含む）、人物（顔のリファレンス、CC0）に加え、表情・ヘアスタイル・歴史服装・シーン・ライティング・小道具・家具の 7 つの拡張ライブラリ。すべての画像に中国語の説明と、コピーできる英語のプロンプトが付いています。
 - **検索とフィルター**：中国語または英語で検索、カテゴリーで絞り込み、並べ替え、ランダムな画像の選択ができます。各アイテムには共有用の静的ページがあります。
 - **試着スタジオ**：写真をアップロードし、服装とポーズを選んで生成します。写真なしで生成することもできます。1 回の実行で複数の出力、ビフォーアフターのスライダー、単体または zip でのダウンロードに対応しています。
-- **生成履歴**：IndexedDB にローカルで保存されます。アイテムの表示、削除、消去、取り消しができます。
+- **生成履歴**：IndexedDB に保存される専用ページ（上限 200 件）。全選択して一括 zip ダウンロード、プロンプトとパラメータのメタデータ付きエクスポート、1 件ごとの再生成、元写真とのビフォーアフター比較ができます。
 - **わかりやすいエラー**：無効なキー、レート制限、タイムアウト、セーフティブロックのそれぞれに専用のメッセージと、次に取るべき手順の提案が表示されます。
 - **誤ったセーフティブロックの低減**：既定でオン。スタジオは、服装やポーズを変えずに、プロンプトを中立的な EC 試着の説明に書き換えます。オフにすると、プロンプトをそのまま送信します。
 - お気に入り、最近のアイテム、プロンプトの組み合わせはすべてローカルに保存。年齢確認付きの 18+ トグル、PWA とオフライン対応、ダークモード、中国語／英語の UI。
@@ -38,9 +38,27 @@
 | OpenAI | API キー（gpt-image には認証済みの組織が必要） | gpt-image-1 | 複数のリファレンスを使う images/edits。モデレーションが最も厳格 |
 | Gemini | Google AI Studio のキー | gemini-2.5-flash-image | 別名 Nano Banana |
 | Doubao Seedream | Volcengine Ark のキー | doubao-seedream-4-0-250828 | CORS のため既定でサイトのプロキシ経由 |
-| Custom relay | ベース URL、キー、モデル | 任意 | OpenAI 互換。edits（multipart）または generations（JSON）を選択 |
+| Custom relay | ベース URL、キー、モデル | 任意 | OpenAI 互換（edits / generations）または Gemini プロトコル（`models/:generateContent`）。プロキシのトグルはリレーにも適用され、オフの場合は直接接続、リレーのエンドポイントは任意のポートを使用可能 |
 
 ## 変更履歴
+
+### 2026-11-23 · v1.1.0
+
+- ヘアスタイルの全画像（およびアニメ服の CharaDB 分）が読み込めなかった問題を修正：サイトの CSP の `img-src` 許可リストにホットリンク先のオリジンが欠けており、ブラウザがすべてブロックしていました。ビルド時にデータからホットリンクのオリジンを自動収集して許可リストへ書き込むようになり、`tests/check_csp.py` がビルド後に検証します。
+- README（中国語／英語／日本語）を現在の機能に合わせて更新。
+
+### 2026-11-22 · 生成履歴ページ、プロキシ修正、リレーの Gemini プロトコル
+
+- 新しい **生成履歴** ページ（@OrangeSAM によるコントリビュート）：全選択の一括ダウンロード、プロンプト／パラメータのメタデータ付き ZIP エクスポート、1 件ごとの再生成、元写真とのビフォーアフター比較。上限 200 件。
+- カスタムリレーでプロキシのトグルが効かなかった問題を修正：オフの場合は直接接続に。プロキシはリレーの任意ポートを許可（公式ドメインは HTTPS のみ、プライベートアドレスは引き続きブロック）。
+- カスタムリレーに Gemini プロトコル（`models/:generateContent`、認証ヘッダーは自動切替）を追加。
+- ワイド画面でヘッダーが重なる問題を修正（@yansiao1227 によるコントリビュート）。
+
+### 2026-11-21 · 7 つの拡張ライブラリ、画像を R2 へ移行
+
+- 新しいタブ 7 つ：表情 95、ヘアスタイル 122（CharaDB、画像はホットリンク）、歴史服装 57、シーン 64、ライティング 50、小道具 32、家具 41。アニメ服に CharaDB の 440 点が加わり、合計 **1,760 点**に。
+- 全画像の配信を Cloudflare R2（`pwimg.0vo.pro`）に移行。深度ポーズ画像はホットリンクをやめて自前ホスティングにし、読み込みが安定しました。
+- Seedream 5.x で生成が失敗する問題を修正（@COBEZE によるコントリビュート）：5.x 向けパラメータは 4.x モデルにのみ送るようになりました。
 
 ### 2026-11-19 · アニメ服ライブラリ
 
@@ -71,7 +89,7 @@ python3 build.py                  # outputs dist/
 python3 -m http.server 8787 -d dist
 ```
 
-別の素材フォルダを使うには `POSEWEAR_RAW` を、サイトマップや共有リンク用に独自のサイト URL を設定するには `POSEWEAR_SITE` を設定します。
+別の素材フォルダを使うには `POSEWEAR_RAW` を、サイトマップや共有リンク用に独自のサイト URL を設定するには `POSEWEAR_SITE` を設定します。`POSEWEAR_ASSET_HOST` を設定すると、サムネイルと原画像は別の `dist-assets/` フォルダーに出力されます（単独でデプロイするか R2 にアップロード可能）。メインサイトにはページとデータだけが残ります。
 
 ## デプロイ
 
@@ -93,6 +111,8 @@ Playwright のテストはすべてのプロバイダーのエンドポイント
 npm install && npx playwright install chromium
 python3 -m http.server 8787 -d dist &
 node tests/v12.js && node tests/v13.js
+node tests/v16-proxy.mjs && node tests/v17-history.js   # プロキシ規則 / 履歴ページ
+python3 tests/check_csp.py dist   # すべての画像オリジンが CSP の許可リストにあるか検証
 ```
 
 ## FAQ
@@ -109,7 +129,7 @@ Issue と PR を歓迎します。PR を出す前に `python3 build.py` と両�
 
 ## 謝辞
 
-[AI Pose Gallery](https://ai-pose-gallery.pages.dev/) · [AI Costume Gallery](https://ai-costume-gallery.pages.dev/) · [AI Costume Anime Gallery](https://ai-costume-anime-gallery.pages.dev/) by [@giaaibusi](https://x.com/giaaibusi) · [AI Pose Depth Gallery](https://ai-pose-depth-gallery.pages.dev/) by [ギア / @giaaibusi](https://x.com/giaaibusi)（ホットリンク、非公式の中国語インデックス。画像はこのリポジトリには含まれません） · [AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) by [@agi_aibusi](https://x.com/agi_aibusi)（CC0） · [wzc520pyfm/gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) · [paipiange/nvzhuang](https://github.com/paipiange/nvzhuang)
+[AI Pose Gallery](https://ai-pose-gallery.pages.dev/) · [AI Costume Gallery](https://ai-costume-gallery.pages.dev/) · [AI Costume Anime Gallery](https://ai-costume-anime-gallery.pages.dev/) by [@giaaibusi](https://x.com/giaaibusi) · [AI Pose Depth Gallery](https://ai-pose-depth-gallery.pages.dev/) by [ギア / @giaaibusi](https://x.com/giaaibusi)（非公式の中国語インデックス。画像は本サイトで自前ホスティング、著作権は作者に帰属） · CharaDB by たき AI（ヘアスタイルとアニメ服の一部。タグデータは CC0、画像は元のサイトからホットリンクし、ここには保存しません） · [AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) by [@agi_aibusi](https://x.com/agi_aibusi)（CC0） · [wzc520pyfm/gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) · [paipiange/nvzhuang](https://github.com/paipiange/nvzhuang)
 
 ## ライセンスと素材の扱い
 
@@ -118,7 +138,8 @@ Issue と PR を歓迎します。PR を出す前に `python3 build.py` と両�
 | コード、UI コピー、ビルドスクリプト | はい | [MIT](LICENSE) |
 | ポーズと服装の画像・データ | いいえ — `fetch-assets.py` でダウンロード | [@giaaibusi](https://x.com/giaaibusi)（[AI Pose Gallery](https://ai-pose-gallery.pages.dev/) / [AI Costume Gallery](https://ai-costume-gallery.pages.dev/) / [AI Costume Anime Gallery](https://ai-costume-anime-gallery.pages.dev/)）に帰属。オープンライセンスの明示はなし |
 | 人物画像 | いいえ — 上と同じ | [@agi_aibusi](https://x.com/agi_aibusi)（[AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/)）による [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
-| 深度ポーズ画像 | いいえ — [AI Pose Depth Gallery](https://ai-pose-depth-gallery.pages.dev/) から `<img>` でホットリンク | [ギア / @giaaibusi](https://x.com/giaaibusi) に帰属。このリポジトリにはテキストのメタデータと中国語名のみ |
+| 深度ポーズ画像 | いいえ — 本サイトの CDN で自前ホスティング（出典は [AI Pose Depth Gallery](https://ai-pose-depth-gallery.pages.dev/)） | [ギア / @giaaibusi](https://x.com/giaaibusi) に帰属。このリポジトリにはテキストのメタデータと中国語名のみ |
+| ヘアスタイルと CharaDB のアニメ服画像 | いいえ — CharaDB から `<img>` でホットリンク | タグデータは CC0。画像の著作権は CharaDB の作者 たき AI に帰属し、ここでは保存も再配布もしない |
 | 深度ポーズのテキストメタデータ | はい、`depth/packs/` | 日本語テキストは原作者に帰属。中国語名は本プロジェクトのもの |
 | README のスクリーンショット | はい | 表示されている画像は上記のとおり各作者に帰属 |
 
