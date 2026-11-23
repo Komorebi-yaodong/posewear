@@ -42,6 +42,13 @@ Pose, outfit and portrait reference galleries with bilingual prompts, plus a bri
 
 ## Changelog
 
+### 2026-11-23 · v1.2.0
+
+- The combo tray now generates images directly: pick outfits, poses, portraits and expressions in the galleries, then generate right inside the tray (editable prompt, count and aspect ratio). Results open full-size, download, and are saved to the generation history automatically — no trip to the studio required.
+- Studio polish: removed the empty spacer in the right column; results scroll into view when ready.
+- Site-wide copy and data corrections: anime outfits 1320 → 1760 (hero stats, meta, announcement, footer), CharaDB credited in the footer, privacy note corrected for depth-pose delivery; tray height capped with internal scrolling, announcement clamped to two lines on mobile.
+- New `tests/v18-quick.js` covers the full tray generation flow.
+
 ### 2026-11-23 · v1.1.0
 
 - Fixed every hairstyle image (and the CharaDB part of anime outfits) failing to load: the site's CSP `img-src` allowlist was missing the hotlinked origin, so browsers blocked them all. The build now collects hotlink origins from the data automatically, and `tests/check_csp.py` guards the allowlist after each build.
