@@ -88,6 +88,22 @@ def _vmod(sub,pre):
   return out
 EXP=_vmod('expression','e'); DYN=_vmod('dynasty','y'); SCE=_vmod('scene','s'); LIG=_vmod('light','l'); PRO=_vmod('prop','t'); FUR=_vmod('furn','f')
 _hp=f'{R}/charadb/hair.json'; HAI=json.load(open(_hp)) if os.path.exists(_hp) else []
+# 热链图片的源站（CharaDB 等）：post.py 据此放行 CSP 的 img-src/connect-src，
+# 否则浏览器会拦截全部热链图片（2026-11-23 发型库全图加载失败的根因）。
+def _origins(o):
+  s=set()
+  def w(x):
+    if isinstance(x,dict):
+      for v in x.values(): w(v)
+    elif isinstance(x,list):
+      for v in x: w(v)
+    elif isinstance(x,str) and x.startswith('https://'): s.add('/'.join(x.split('/')[:3]))
+  w(o); return s
+HOTLINK_ORIGINS=set()
+for _f in ['charadb/outfits.json','charadb/hair.json']:
+  _p=f'{R}/{_f}'
+  if os.path.exists(_p): HOTLINK_ORIGINS|=_origins(json.load(open(_p)))
+HOTLINK_ORIGINS=sorted(HOTLINK_ORIGINS)
 EXJ=J(EXP);DYJ=J(DYN);SCJ=J(SCE);LIJ=J(LIG);PRJ=J(PRO);FUJ=J(FUR);HAJ=J(HAI)
 NEWMODS=[('expression',EXP),('dynasty',DYN),('scene',SCE),('light',LIG),('prop',PRO),('furn',FUR)]
 def _cnew(sub,items):
