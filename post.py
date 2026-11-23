@@ -83,9 +83,11 @@ def page(kind,it,rel):
 open(f'{D}/404.html','w').write(f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>页面不存在 | 衣姿 PoseWear</title><meta name="robots" content="noindex"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>{CSS}
 .nf{{max-width:480px;margin:12vh auto;text-align:center;padding:0 20px}}.nf b{{font-size:64px;color:#d81b3a;display:block;line-height:1}}</style></head><body><header><a href="/">{LOGO}衣姿 PoseWear</a></header>
 <div class="nf"><b>404</b><h1>这个页面不存在</h1><p class="mu">链接可能写错了，或者内容已经调整。</p><a class="go" href="/">回到首页</a><a class="go" style="background:#111" href="/#costume">看看服装库</a></div></body></html>''')
-_IMG=" ".join(["'self'","data:","blob:"]+list(DEPTH_ORIGINS)+([AH] if AH else []))
+# CharaDB 图片保留原站链接；试穿工作台也可能直接读取图像。
+_HAIR_ORIGIN=" https://charadb-2fi.pages.dev" if HAI else ""
+_IMG=" ".join(["'self'","data:","blob:"]+list(DEPTH_ORIGINS)+([AH] if AH else []))+_HAIR_ORIGIN
 CSP=("default-src 'self'; script-src 'self' "+SH+(" https://static.cloudflareinsights.com" if WAT else "")+"; style-src 'self' 'unsafe-inline'; img-src "+_IMG+"; font-src 'self' data:; "
- "connect-src 'self' data: blob: https://api.openai.com https://generativelanguage.googleapis.com https://*.volces.com https://*.bytepluses.com https://oaidalleapiprodscus.blob.core.windows.net https://*.googleusercontent.com"+(" https://cloudflareinsights.com" if WAT else "")+"; "
+ "connect-src 'self' data: blob: https://api.openai.com https://generativelanguage.googleapis.com https://*.volces.com https://*.bytepluses.com https://oaidalleapiprodscus.blob.core.windows.net https://*.googleusercontent.com"+_HAIR_ORIGIN+(" https://cloudflareinsights.com" if WAT else "")+"; "
  "worker-src 'self'; manifest-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests")
 IMM='  Cache-Control: public, max-age=31536000, immutable\n'
 # Pages Functions 必须位于部署目录内才会随 wrangler pages deploy 一起发布（曾因只传静态产物导致 /api/proxy 丢失，见 issue #7）
