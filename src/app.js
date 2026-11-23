@@ -90,19 +90,23 @@ function toggleSel(k){const i=st.sel.indexOf(k);i>=0?st.sel.splice(i,1):st.sel.p
 function combo(lang){const its=st.sel.map(k=>ITEMS[k]).filter(Boolean),p=its.filter(i=>i.type=='pose'),d=its.filter(i=>i.type=='depth'),c=its.filter(i=>i.type=='costume'||i.type=='anime'||i.type=='dyn'),r=its.filter(i=>i.type=='portrait'),e=its.filter(i=>i.type=='expr'),h=its.filter(i=>i.type=='hair'),s=its.filter(i=>i.type=='scene'),l=its.filter(i=>i.type=='light');
  if(lang=='en')return['masterpiece, best quality, 1girl',...r.map(i=>i.en.replace(/, consistent facial features, face reference$/,'')),...c.map(i=>i.en.replace(/^\w+ outfit, /,'')),...h.map(i=>'hairstyle: '+i.en),...e.map(i=>'expression: '+i.en),...p.map(i=>prompt(i,'en')),...d.map(i=>'depth reference, '+prompt(i,'en')),...s.map(i=>'scene: '+prompt(i,'en')),...l.map(i=>'lighting: '+prompt(i,'en'))].join(', ');
  return['杰作，最佳画质，一位女性',...r.map(i=>'人物：'+i.len+(i.st?'，'+i.st:'')),...c.map(i=>i.zh.replace(/。$/,'')),...h.map(i=>'发型：'+i.ti),...e.map(i=>'神态：'+i.zh),...p.map(i=>'摆出「'+prompt(i,'zh')+'」的姿势'),...d.map(i=>'深度姿势参考：'+prompt(i,'zh')),...s.map(i=>'场景：'+prompt(i,'zh')),...l.map(i=>'光线：'+prompt(i,'zh'))].join('；')+'。'}
-function tray(added){const n=st.sel.length;if(st.tab=='studio'||st.tab=='history'){$('#tray').hidden=true;document.body.classList.remove('tray');return}$('#tray').hidden=!n;document.body.classList.toggle('tray',n>0);if(!n)return;if(added&&innerWidth>760)$('#tray').classList.remove('min');if(added&&innerWidth<=760&&n==1){$('#tray').classList.add('min');$('#trayMin').textContent='展开'}
+let trayOpen=false;
+function tray(added){const n=st.sel.length,fab=$('#trayFab');if(st.tab=='studio'||st.tab=='history'){$('#tray').hidden=true;if(fab)fab.hidden=true;document.body.classList.remove('tray');return}
+ if(added)trayOpen=true;const open=trayOpen;$('#tray').hidden=!open;if(fab){fab.hidden=open;const bd=$('#trayFabN');bd.textContent=n;bd.hidden=!n}document.body.classList.toggle('tray',open);if(!open)return;$('#tgEmpty').hidden=n>0;$('#trayComboBox').hidden=!n;
  const UN={pose:'个姿势',depth:'个深度姿势',costume:'套服装',anime:'套服装',portrait:'个人像',expr:'个表情',hair:'款发型',dyn:'套历代服饰',scene:'个场景',light:'种光影',prop:'件道具',furn:'件家具'},tc={};st.sel.forEach(k=>{const it=ITEMS[k];if(it)tc[it.type]=(tc[it.type]||0)+1});$('#trayN').textContent=Object.entries(tc).map(([t,m])=>`${m} ${UN[t]||'项'}`).join(' · ');
  $$('[data-tl]').forEach(b=>b.classList.toggle('on',b.dataset.tl==st.tl));
  $('#trayItems').innerHTML=st.sel.map(k=>ITEMS[k]?`<div><img src="${esc(thumb(ITEMS[k]))}"${ITEMS[k].ref?` referrerpolicy="${esc(ITEMS[k].ref)}"`:''} alt=""><em>${TL(ITEMS[k])}</em><b data-k="${k}" title="移除" role="button" aria-label="移除">×</b></div>`:'').join('');$('#trayText').textContent=combo(st.tl);tgSync()}
 $('#trayItems').onclick=e=>{const k=e.target.dataset.k;k&&toggleSel(k)};$('#trayCopyEn').onclick=()=>copy(combo('en'),'组合英文提示词');$('#trayCopyZh').onclick=()=>copy(combo('zh'),'组合中文描述');
 $$('[data-tl]').forEach(b=>b.onclick=()=>{st.tl=b.dataset.tl;SV('tl',st.tl);tray()});
-$('#trayMin').onclick=()=>{const m=$('#tray').classList.toggle('min');$('#trayMin').textContent=m?'展开':'收起'};
+$('#trayMin').onclick=()=>{trayOpen=false;tray()};
+$('#trayFab').onclick=()=>{trayOpen=true;tray()};
+$('#tgAddRow').onclick=e=>{const b=e.target.closest('[data-add]');if(!b||!window.WB)return;WB.openPicker(b.dataset.add,{keys:()=>st.sel.slice(),toggle:k=>{toggleSel(k);return st.sel.includes(k)}})};
 $('#trayClear').onclick=()=>{const s=st.sel;st.sel=[];SV('sel',[]);s.forEach(refreshCard);tray();toast('已清空组合')};
 // —— 托盘简易生图：组合直接同步到试穿台选材，在托盘内生成
 const TG_SLOT={portrait:'portrait',costume:'garment',anime:'garment',dyn:'garment',pose:'pose',depth:'pose',expr:'expr'};
 let tgSig='',tgBusy=false,tgRecs=[],tgUrls=[],tgCur=0;
 function tgGroups(){const g={portrait:[],garment:[],pose:[],expr:[]},extra=[];st.sel.forEach(k=>{const it=ITEMS[k];if(!it)return;const s=TG_SLOT[it.type];if(s)g[s].push(it);else extra.push(it)});return{g,extra}}
-async function tgSync(){const pv=$('#tgProv');if(pv)pv.textContent=window.WB&&WB._cfg.key?WB.provLabel():'未配置 API';if(!st.sel.length||!window.WB)return;const sig=st.sel.join(',');if(sig==tgSig)return;tgSig=sig;const{g,extra}=tgGroups();try{const base=await WB.setSel(g);const ex=extra.map(it=>prompt(it,st.tl)).join(st.tl=='en'?', ':'；');$('#tgPrompt').value=base+(ex?'\n'+(st.tl=='en'?'Additional: ':'补充：')+ex:'')}catch(e){}}
+async function tgSync(){const pv=$('#tgProv');if(pv)pv.textContent=window.WB&&WB._cfg.key?WB.provLabel():'未配置 API';if(!st.sel.length)tgSig='';if(!st.sel.length||!window.WB)return;const sig=st.sel.join(',');if(sig==tgSig)return;tgSig=sig;const{g,extra}=tgGroups();try{const base=await WB.setSel(g);const ex=extra.map(it=>prompt(it,st.tl)).join(st.tl=='en'?', ':'；');$('#tgPrompt').value=base+(ex?'\n'+(st.tl=='en'?'Additional: ':'补充：')+ex:'')}catch(e){}}
 function tgStat(t){const s=$('#tgStat');if(!s)return;s.hidden=!t;if(t)s.textContent=t}
 function tgRender(){tgUrls.forEach(u=>URL.revokeObjectURL(u));tgUrls=tgRecs.map(r=>URL.createObjectURL(r.after));$('#tgRes').innerHTML=tgUrls.map((u,i)=>`<button data-tg="${i}" title="查看大图"><img src="${u}" alt="生成结果 ${i+1}"></button>`).join('')}
 $('#tgRes').onclick=e=>{const b=e.target.closest('[data-tg]');if(!b)return;tgCur=+b.dataset.tg;$('#tgViewImg').src=tgUrls[tgCur];$('#tgView').hidden=false};
