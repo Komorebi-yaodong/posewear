@@ -88,7 +88,7 @@ Current release **v1.3.1** (2026-11-24): restores proxy forwarding for custom re
 
 ## Sources and licenses
 
-Code, UI text, and build scripts are [MIT](LICENSE). Images belong to their sources — keep the credits if you self-host:
+Code, UI text, and build scripts are [MIT](LICENSE). Self-hosting and derivative works are welcome — just don’t pass yourself off as the official project, and don’t publish sites or “clients” under the PoseWear name. Images belong to their sources — keep the credits if you self-host:
 
 | Material | Source |
 | --- | --- |
