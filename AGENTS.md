@@ -25,7 +25,7 @@
 | `src/theme.js` | 首屏外观、系统主题与用户选择的同步 |
 | `src/history.js` | 生成记录页（数据在浏览器 IndexedDB `lk-studio` 的 `h` 表，上限 200 条） |
 | `src/extras.js` | `window.X` 工具（下载、ZIP 等）；`src/zip.js` 打包 |
-| `functions/api/proxy.js` | Pages Function：CORS 转发代理（只许本站来源、官方域名限标准 https、自定义 HTTPS 中转按部署变量 POSEWEAR_PROXY_ORIGINS 精确匹配来源和端口） |
+| `functions/api/proxy.js` | Pages Function：CORS 转发代理（只许本站来源、官方域名限标准 https、自定义中转 http/https 任意端口但禁内网地址、只转发必需请求头） |
 | `scripts/fetch-assets.py` | 从上游站抓素材到 `assets-raw/`（低并发，勿反复全量抓） |
 | `scripts/prep-modules.py` | 新模块（表情/发型等）素材预处理 |
 | `scripts/sync-r2.py` | 把图片目录同步到 R2（断点续传，见下） |
@@ -109,7 +109,8 @@ U=http://127.0.0.1:8902 npm test
 ## 关键机制速记
 
 - **悬浮生图工作台**（app.js 托盘 + studio.js）：点击 `#trayFab` 展开工作台，浏览、切换素材库时面板保持打开。收起后，创作条保留已选素材缩略图。面板内「添加素材」经 `WB.openPicker(type, sink)` 复用 studio 的选择器往组合里加；仅在转入完整工作台时由 `WB.setSel` 同步槽位（服装/动画/历代→服装≤2，姿势/深度→姿势≤6，人像→人物≤1。表情≤1，发型、场景、光影、道具和家具归入「其他素材」，均以参考图随生成请求发送）；生成走 `WB.quick(opts)` = studio `run()` 的 quick 模式（跳过试穿台 UI、结果回托盘并存入生成记录）。试穿台本体是「完整工作台」，两者共用一套生成核心，不要另起炉灶。
-- 需要代理自定义 HTTPS 服务时，通过部署变量 `POSEWEAR_PROXY_ORIGINS` 登记其完整来源（含端口），多个来源以空格或逗号分隔。服务商配置存 localStorage `wbCfg`；配置只持久化在浏览器。直连时密钥与图片发往所选服务，启用代理时本站 Function 经手并转发请求，不保存请求内容。
+- 代理对自定义中转开放（2026-11-24 维护者定版，勿改回登记制）：带 `x-proxy-custom: 1` 的请求可转发到任意公网 http/https 地址与端口，仅禁内网地址与非图片接口路径。服务商配置存 localStorage `wbCfg`；配置只持久化在浏览器。直连时密钥与图片发往所选服务，启用代理时本站 Function 经手并转发请求，不保存请求内容。
+- 图片缓存策略：图库图片路径（/p/ /c/ /a/ /r/ /e/ /y/ /s/ /l/ /t/ /f/ /o/）与 R2 对象一律 `max-age=31536000, immutable`（图片按 ID 寻址、内容不变）；只有 HTML 与 sw.js 走 revalidate/no-cache。勿把图片改回 must-revalidate。
 - 公告、应用更新和最近操作由 `#noticeMenu` 集中展示。素材来源与许可位于页脚 `#credits`。
 - `copyRefs` 默认开启。卡片、灯箱、悬浮及完整工作台复用同一参考图格式。保留选定的 `angles` 视角和原站热链，本地上传图在复制文本中提示用户另附。
 - localStorage 键：`wbCfg`、`wbSel`（试穿台选材）、`sel`（组合）、`fav`、`theme`、`lang` 等，改名即丢用户数据，慎改。

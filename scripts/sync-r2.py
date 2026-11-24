@@ -27,7 +27,7 @@ TOML = os.path.expanduser("~/.config/.wrangler/config/default.toml")
 CT = {".webp": "image/webp", ".png": "image/png", ".jpg": "image/jpeg",
       ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml",
       ".json": "application/json", ".txt": "text/plain"}
-CC = "public, max-age=0, must-revalidate"
+CC = "public, max-age=31536000, immutable"
 
 
 def get_token():
@@ -49,13 +49,17 @@ def main():
     journal_path = os.path.abspath(args.journal or os.path.join(root, ".r2-journal"))
     fail_path = journal_path + ".fail"
     done = {}
+    legacy = set()
     if os.path.isfile(journal_path):
         with open(journal_path) as rows:
             for row in rows:
+                row = row.strip()
+                if not row: continue
                 try:
                     account, bucket, key, digest = json.loads(row)
                 except (ValueError, TypeError):
-                    continue  # Legacy journals do not identify the bucket or content.
+                    legacy.add(row)  # 旧格式 journal 只有对象键，表示已上传成功
+                    continue
                 if account == ACCT and bucket == BUCKET: done[key] = digest
     keys = []
     for dp, _, fns in os.walk(root):
@@ -87,7 +91,7 @@ def main():
     def put_one(rel):
         with open(os.path.join(root, rel), "rb") as source: data = source.read()
         digest = hashlib.sha256(data).hexdigest()
-        if done.get(rel) == digest:
+        if done.get(rel) == digest or rel in legacy:
             with jlock: stats["skipped"] += 1
             return
         url = f"https://api.cloudflare.com/client/v4/accounts/{ACCT}/r2/buckets/{BUCKET}/objects/{quote(rel)}"

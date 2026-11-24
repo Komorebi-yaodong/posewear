@@ -343,9 +343,6 @@ button.empty0::before{content:"";flex:none;width:40px;height:40px;border-radius:
 #wbPo{max-height:196px;overflow:auto}.r3{margin-top:8px}.r3:not(:has(:not([hidden]):not(.sp))){display:none}
 /* right column */
 .st-r .cfg{width:100%;justify-content:flex-start;padding:11px 14px;border-radius:14px}.st-r .cfg b{margin-left:auto}
-.flow{display:flex;align-items:center;justify-content:space-between;gap:2px;padding:10px 12px;background:var(--bg2);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 0 0 1px rgba(0,0,0,.03)}
-.flow span{font-size:12px;font-weight:600;color:var(--mu);display:flex;align-items:center;gap:5px}.flow span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sf2)}
-.flow span.on{color:var(--tx)}.flow span.on::before{background:var(--ok)}.flow span[data-f="4"].on{color:var(--ac)}.flow span[data-f="4"].on::before{background:var(--ac)}.flow i{color:#ccc;font-style:normal}
 .quick,.adv,.st-r .hist{background:var(--bg2);border-radius:16px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 0 0 1px rgba(0,0,0,.03);margin:0;border:0}
 .lab0{font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px}.quick .chips .chip{padding:6px 11px;font-size:12.5px}
 .q2{margin-top:10px}.q2 .row{margin:0;gap:10px;flex-wrap:nowrap}.q2 .lab{font-size:12.5px}.q2 select{padding:6px 28px 6px 12px;font-size:12.5px}

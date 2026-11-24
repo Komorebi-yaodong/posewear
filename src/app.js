@@ -1,5 +1,5 @@
 'use strict';
-let Q0='',QT='';try{const u=new URLSearchParams(location.search);Q0=(u.get('q')||'').slice(0,60);QT=u.get('t')||''}catch(e){}
+const _u=new URLSearchParams(location.search);let Q0=(_u.get('q')||'').slice(0,60),QT=_u.get('t')||'';
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),LS=k=>{try{return JSON.parse(localStorage[k]||'null')}catch(e){return null}},SV=(k,v)=>{try{localStorage[k]=JSON.stringify(v)}catch(e){}};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)'),HOVER=matchMedia('(hover:hover) and (pointer:fine)').matches;
@@ -482,7 +482,7 @@ $('#sugg').onclick=e=>{const s=e.target.closest('[data-s]');if(s){st.f={};$('#q'
 $('#sort').onchange=e=>{st.sort=e.target.value;viewT(apply)};
 $('#qDone').onclick=()=>$('#libraryMenu summary').focus({preventScroll:true});
 let qt;$('#q').oninput=e=>{$('#qx').hidden=!e.target.value;clearTimeout(qt);qt=setTimeout(()=>{st.q=e.target.value;apply()},160)};$('#qx').onclick=()=>{$('#q').value='';st.q='';$('#qx').hidden=true;apply();$('#q').focus()};
-function randPick(){if(!st.list.length)return toast('当前没有可选的内容');const i=Math.random()*st.list.length|0;lbOpen(i);0}
+function randPick(){if(!st.list.length)return toast('当前没有可选的内容');const i=Math.random()*st.list.length|0;lbOpen(i)}
 $('#rand').onclick=randPick;
 // 语言
 function setLang(l,quiet){st.lang=l;SV('lang',l);document.documentElement.dataset.lang=l;$$('button[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang==l));grid.querySelectorAll('.card').forEach(c=>{const origin=ITEMS[c.dataset.k];if(origin)c.querySelector('.sub').textContent=subtitle(cardFace(origin),origin.type)});if(!quiet)toast(l=='zh'?'描述语言：中文':'描述语言：英文提示词')}
@@ -662,7 +662,7 @@ let closing=false;function lbClose(navigate=false,immediate=false){if($('#lb').h
  if(lbPushed){lbPushed=false;if(!leaving)history.back()}
  const it=st.list[li],c=it&&grid.querySelector(`.card[data-k="${CSS.escape(it.k)}"]`),r=c&&c.querySelector('.ph').getBoundingClientRect();
  const vis=r&&r.bottom>0&&r.top<innerHeight;const done=()=>{closing=false;lbVariant=null;$('#lb').hidden=true;document.body.style.overflow='';$('.lb-box').getAnimations().forEach(a=>a.cancel());if(!leaving&&location.hash.includes('/'))history.replaceState(null,'','#'+st.tab);
- if(!leaving&&lbVisitedPair&&(st.tab==='recent'||st.tab==='fav'&&pend.size))apply();
+ if(!leaving&&lbVisitedPair&&(st.tab==='recent'||(st.tab==='fav'&&pend.size)))apply();
  else if(st.tab==='fav')pend.forEach(k=>!st.fav.has(k)&&dropCard(k));
  lbVisitedPair=false;pend.clear();
  if(fromHistory)window.HIS?.closed?.(!leaving);

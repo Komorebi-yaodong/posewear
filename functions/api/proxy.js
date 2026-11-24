@@ -1,3 +1,7 @@
+// 衣姿 PoseWear 转发代理（v11）：只转发、不记录、不存储任何请求内容或密钥。
+// 限制：① 只接受本站页面发起的请求（Origin / Referer 同源）；② 官方接口只走标准 https；
+// 自定义中转必须带 x-proxy-custom: 1 且路径符合图片接口格式，可用 http/https 任意端口（内网地址除外）；
+// ③ 结果图片只从官方结果 CDN 下载；④ 每 IP 频率限制；⑤ 只转发服务商必需的请求头。
 const API_PATH=/^\/(api\/v3|v\d+(beta|alpha)?)\/(images\/(edits|generations)|models(\/[^/]+(:generateContent)?)?)$/;
 const OFFICIAL=[/^api\.x\.ai$/,/^api\.openai\.com$/,/^generativelanguage\.googleapis\.com$/,/^ark\.[a-z0-9-]+\.volces\.com$/,/^ark\.[a-z0-9-]+\.bytepluses\.com$/];
 const IMG_HOSTS=[/^oaidalleapiprodscus\.blob\.core\.windows\.net$/,/(^|\.)volces\.com$/,/(^|\.)bytepluses\.com$/,/(^|\.)googleusercontent\.com$/];
@@ -18,7 +22,7 @@ export async function onRequest(ctx){const {request}=ctx;
   let t;try{t=new URL(request.headers.get('x-target-url')||'')}catch(e){return j(400,'缺少或无效的 x-target-url')}
   if(t.username||t.password)return j(400,'目标地址不能带账号密码');
   const official0=OFFICIAL.some(r=>r.test(t.hostname));
-  if(t.protocol!=='https:' || (official0 && t.port))return j(400,'目标必须使用 HTTPS；官方接口只支持标准端口');
+  if(official0?(t.protocol!=='https:'||(t.port&&t.port!=='443')):!/^https?:$/.test(t.protocol))return j(400,official0?'官方接口地址必须是标准 https 地址':'目标地址必须是 http/https 地址');
   const ip=request.headers.get('cf-connecting-ip')||'0';
   const img=request.headers.get('x-proxy-kind')==='image';
   if(img){if(request.method!=='GET')return j(405,'图片下载只支持 GET');
@@ -30,10 +34,7 @@ export async function onRequest(ctx){const {request}=ctx;
   if(!official&&!custom)return j(403,'该地址不是官方接口；自定义中转需在设置中选择「自定义」');
   const path=t.pathname.replace(/\/+$/,'');
   if(official?!API_PATH.test(path):!/\/(images\/(edits|generations)|models(\/[^/]+(:generateContent)?)?)$/.test(path))return j(403,'该路径不允许通过代理转发');
-  // Administrators opt in each relay by exact HTTPS origin, including any nonstandard port.
-  // Browser direct mode is available for arbitrary HTTPS relays that support CORS.
-  const relays = (ctx.env?.POSEWEAR_PROXY_ORIGINS || '').split(/[\s,]+/).filter(Boolean);
-  if(!official && !relays.includes(t.origin))return j(403,'本站代理未登记此中转。请关闭代理直连，或联系部署者登记 HTTPS 来源。');
+  if(custom&&/^(localhost|127\.|10\.|192\.168\.|169\.254\.|\[)/.test(t.hostname))return j(403,'不能转发到内网地址');
   if(await over(ip,'api',ctx))return j(429,'请求过于频繁，请稍后再试');
   const h=new Headers();for(const name of FORWARD)if(request.headers.has(name))h.set(name,request.headers.get(name));
   try{const r=await fetch(t.toString(),{method:request.method,headers:h,...(request.method==='POST'?{body:request.body,duplex:'half'}:{}),redirect:'manual'});

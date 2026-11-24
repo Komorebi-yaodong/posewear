@@ -6,6 +6,13 @@
 
 ## 简体中文
 
+### 2026-11-24 · v1.3.1
+
+- 官方声明：官网只有 posewear.pages.dev，没有 Windows / Android 客户端，也不提供 exe、apk 下载；posewear.cn 等站点均为冒充。声明已同步到三语 README 与站内通知区。
+- 修复 v1.3.0 的两处回退：本站代理恢复转发任意公网自定义中转（http/https、任意端口，内网地址除外），不再要求部署者逐个登记；图库图片恢复一年期 immutable 缓存，不再每次访问都重新验证。
+- 生图请求失败不再静默降级：移除了「自动换接口协议重试」「自动丢掉参考图重试」等多层兜底，只保留图片字段名的一种已知兼容重试，其余错误直接报出。
+- 清理失效的三语词条、已下线 UI 的残留样式与过时文案；三语 README 重写。
+
 ### 2026-11-24 · v1.3.0
 
 - 在姿势卡片上点编号，可在同一机位的线稿和深度图之间翻面。复制单条或组合提示词会附上所选角度的参考图链接。
@@ -58,6 +65,12 @@
 
 ## English
 
+### 2026-11-24 · v1.3.1
+
+- Fixes two v1.3.0 regressions: the site proxy again forwards to any public custom relay (http/https, any port, private addresses excluded) instead of requiring per-endpoint registration, and gallery images are back to one-year immutable caching instead of revalidating on every visit.
+- Generation failures no longer degrade silently: the layered fallbacks that switched API protocols or dropped reference images are gone. One known compatibility retry (the alternate image field name) remains; everything else surfaces as an error.
+- Removed stale trilingual dictionary entries, dead styles from retired UI, and outdated copy; rewrote the three READMEs.
+
 ### 2026-11-24 · v1.3.0
 
 - Click a pose card’s ID to flip between its line drawing and depth map at the same camera angle. Copying a single or mixed prompt includes image links for the selected views.
@@ -109,6 +122,12 @@
 <a id="ja"></a>
 
 ## 日本語
+
+### 2026-11-24 · v1.3.1
+
+- v1.3.0 の2つの後退を修正：サイトプロキシは、デプロイ担当者による個別登録を必要とせず、任意の公開カスタム中継（http/https・任意ポート、プライベートアドレス除く）へ再び転送します。ギャラリー画像も、毎回再検証する方式から1年間の immutable キャッシュに戻しました。
+- 生成失敗時のサイレントな縮退を廃止：「API 方式を自動で切り替えて再試行」「参照画像を落として再試行」といった多段フォールバックを削除しました。残るのは画像フィールド名の既知の互換リトライのみで、それ以外はエラーとして表示します。
+- 古くなった三言語辞書の項目、廃止した UI の残留スタイル、古い文案を整理し、3言語の README を書き直しました。
 
 ### 2026-11-24 · v1.3.0
 

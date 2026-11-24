@@ -1,16 +1,53 @@
+<div align="center">
+
 # 衣姿 PoseWear
 
-[简体中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
+絵を描くとき、写真を撮るとき、AI で画像を作るときの参考素材を探す場所。
 
-作画、撮影、AI 試着のための参考画像を探せるギャラリーです。ポーズを選んで同じアングルの深度画像に切り替え、人物や衣装と組み合わせます。プロンプトと画像リンクをエージェントに渡したり、そのままスタジオで画像を生成したりできます。
+ポーズ・衣装・人物・表情など 12 の素材集に、中英プロンプト付き。
+素材を選べばそのままブラウザで生成でき、組み合わせを AI エージェントに渡すこともできます。
 
-[ギャラリーを開く](https://posewear.pages.dev/) · [ローカルで起動](#ローカルで起動) · [エージェントと接続](mcp/README.md) · [更新履歴](CHANGELOG.md#ja)
+[オンライン版](https://posewear.pages.dev/) · [简体中文](README.md) · [English](README.en.md) · [更新履歴](CHANGELOG.md)
 
-![衣装ライブラリの絞り込みとコーディネートの参考画像](docs/home-ja.jpg)
+> **偽サイトにご注意**：公式サイトは [posewear.pages.dev](https://posewear.pages.dev/) のみです。Windows / Android アプリはなく、exe や apk のダウンロードも提供していません。posewear.cn などは偽サイトです。API キーを入力しないでください。
 
-## ローカルで起動
+![衣装ライブラリ](docs/home-ja.jpg)
 
-Node.js 22.12 以降を使用します。プレビューの初回アクセス時に公開カタログ 12 件を取得し、画像は閲覧に合わせて読み込みます。ソースの ZIP を入手した場合は、展開したプロジェクトのディレクトリで `npm ci` から実行してください。
+</div>
+
+## 素材の探し方
+
+- **ポーズは線画と深度画像のペア**：同じポーズ・同じアングルの両面がそろっています。カードの番号を押すと裏返り、両方を生成に使うこともできます。
+- **フローティング作業台で集める**：閲覧しながらカードの ＋ を押すだけで下部の作業台に入ります。そこから生成したり、プロンプトと画像リンクをまとめてコピーしたりできます。
+- **本格スタジオでは自由に組み合わせ**：人物・衣装・ポーズに、表情・髪型・背景・照明・小道具・家具を加えて。使う素材は1つでも、プロンプトだけでも大丈夫です。自分の写真をアップロードすれば試着の比較もできます。
+- 生成した画像は「生成履歴」に保存され、表示・ダウンロード・ZIP 書き出しができます。
+
+![スタジオ](docs/studio-ja.jpg)
+
+<table><tr>
+<td width="30%"><img src="docs/mobile-ja.jpg" alt="スマートフォンでの閲覧"><br><sub>スマホでも素材探し</sub></td>
+<td><img src="docs/dark-ja.jpg" alt="ダークモード"><br><sub>ダークモード（初期設定はシステム連動）</sub></td>
+</tr></table>
+
+画面は日本語・中国語・英語の3言語対応。素材の説明は中国語と英語を切り替えられます。
+
+## 生成方法は3つから
+
+**自分の API キーで** — OpenAI、Gemini、豆包 Seedream のキー、または OpenAI / Gemini / xAI 互換の中継サービスを設定します。ブラウザから直接送るか、このサイトのプロキシ経由（http/https・任意ポート対応）で送れます。
+
+**この端末のモデルで** — ComfyUI や stable-diffusion.cpp を動かしているなら、ローカルエンジンに接続して生成できます。画像が端末の外に出ることはありません。[設定ガイド](docs/local-engines.md)
+
+**AI エージェントに任せる** — リポジトリには MCP サーバーが入っていて、エージェントが素材検索、角度指定の取得、プロンプトと参照リンクの組み立てを自分で行えます：
+
+```sh
+codex mcp add posewear -- node "$PWD/mcp/server.mjs"
+```
+
+あとは「横向きの座りポーズに春服を合わせて、プロンプトと参考リンクをちょうだい」と頼むだけです。[MCP ガイド](mcp/README.md)
+
+## ローカルで動かす
+
+Node.js 22.12 以上が必要です：
 
 ```sh
 git clone https://github.com/atuizz/posewear.git
@@ -19,51 +56,26 @@ npm ci
 npm start
 ```
 
-[ローカルのギャラリー](http://127.0.0.1:8787/)を開きます。閲覧、お気に入り登録、参考画像リンクのコピーにはアカウントも API キーも不要です。
+http://127.0.0.1:8787/ を開いてください。閲覧・お気に入り・コピーにアカウントやキーは不要です。素材目録は初回にオンラインから読み込み、画像は必要なときに読み込みます。
 
-## 素材を選んで画像を作る
+お気に入り・設定・API キーはお使いのブラウザ内にだけ保存され、生成履歴もブラウザのデータベースに保存されます。サイトデータを消せば一緒に消えます。
 
-| 場所 | できること |
+## 開発
+
+素の JS と Python ビルド、Cloudflare Pages のみで、フレームワークは使っていません。ビルド・素材準備・テスト・デプロイの手順は [AGENTS.md](AGENTS.md) にまとめています。回帰テストは `npm test` です。
+
+現在のバージョンは **v1.3.1**（2026-11-24）：カスタム中継へのプロキシ転送と、画像の長期キャッシュを復旧しました。[全バージョン履歴](CHANGELOG.md)
+
+## 素材の出典とライセンス
+
+コード・画面文案・ビルドスクリプトは [MIT](LICENSE) です。画像の権利は各出典に帰属します。自前で公開する場合は出典表示を残してください：
+
+| 素材 | 出典 |
 | --- | --- |
-| 素材ライブラリ | ポーズカードの下部でアングルを選択。左上の番号を押すと、同じアングルの線画と深度画像を切り替えられます。同じポーズ・アングルの両方を生成時に使えます。 |
-| フローティングスタジオ | カードの「＋」で素材を追加します。スタジオを開いたまま別の素材やライブラリを選べます。単体・組み合わせのどちらも、プロンプトをコピーすると選択したアングルの画像 URL が付きます。アップロードした手元の写真は別途添付してください。 |
-| スタジオ | 人物・衣装・ポーズを自由に組み合わせられます。表情、髪型、背景、照明、小物、家具は「その他の素材」から選択。小物一つ、あるいは文章だけでも生成できます。編集したプロンプト、枚数、縦横比は次回も引き継がれます。試着では、自分の写真と生成結果を見比べられます。 |
-| 生成履歴 | 結果を見直して保存したり、画像・プロンプト・設定をまとめて ZIP で書き出したりできます。保存件数はブラウザーごとに最大 200 件です。 |
+| ポーズ、深度ポーズ、衣装、アニメ衣装 | ギア / @giaaibusi。商用・転載は作者に確認してください。[線画](https://ai-pose-gallery.pages.dev/) · [深度](https://ai-pose-depth-gallery.pages.dev/) · [衣装](https://ai-costume-gallery.pages.dev/) · [アニメ衣装](https://ai-costume-anime-gallery.pages.dev/) |
+| 人物 | @agi_aibusi の架空 AI 人物、CC0。作者はそのままの一括転載を控えるよう求めています。[AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) |
+| 髪型と一部のアニメ衣装 | たき AI / CharaDB。タグは CC0、画像は元サイトから読み込みます。[CharaDB](https://charadb-2fi.pages.dev/) |
+| 表情 | WaveSpeed AI Emotion Gallery。頭部モデルは ICT FaceKit（© USC Institute for Creative Technologies、MIT） |
+| 時代衣装、背景、照明、小道具、家具 | Shisei / wquguru、CC0 1.0 |
 
-![スタジオの素材選択、ボードと生成設定](docs/studio-ja.jpg)
-
-[人物・衣装・ポーズを組み合わせた試着例](docs/banner.jpg)
-
-素材メニューでは 12 のライブラリを「動作」「人物・髪型」「衣類」「空間・小物」の四つに分類しています。スマートフォンからも素材を選べます。地球のアイコンから表示言語（中・英・日）、素材の説明言語（中・英）、コピー時の画像リンクの有無を設定できます。外観は初期設定でシステムに合わせます。ヘッダーではライト・ダークを指定でき、ベルから更新や直近の操作を確認できます。
-
-<table><tr><td width="28%" valign="top"><img src="docs/mobile-ja.jpg" alt="スマートフォンでの表示" width="100%"></td><td valign="top"><img src="docs/dark-ja.jpg" alt="ダークモードの PoseWear" width="100%"></td></tr></table>
-
-## 生成方法を選ぶ
-
-- **クラウドサービス。** スタジオのプロバイダー設定に自身の API キーを入力します。OpenAI、Gemini、Seedream のほか、OpenAI・Gemini・xAI の画像 API と互換性のある HTTPS サービスを利用できます。直接接続ではキー、プロンプト、画像が選択したサービスに送られます。プロキシを有効にすると Pages Function が同じ内容を転送します。料金と利用上限は各サービスの規定に従います。
-- **ローカルモデル。** ComfyUI を起動してローカルのスタジオで選択し、接続テスト後にインストール済みのチェックポイントを指定します。付属ワークフローは参考画像 1 枚に対応します。複数枚には独自のワークフローを使用できます。stable-diffusion.cpp の `sd-server` を使う場合は `POSEWEAR_LOCAL_ENGINE=sd-cpp npm start` でプレビューを起動します。[ローカルエンジンの設定（中国語）](docs/local-engines.md)
-- **エージェント。** リポジトリのルートで `codex mcp add posewear -- node "$PWD/mcp/server.mjs"` を実行して、新しい Codex セッションを開きます。例えば「横から見た座りポーズと春服を探して、プロンプトと参考画像 2 枚のリンクをください」と依頼できます。ほかの stdio クライアントでは、コマンドに `node`、引数に `mcp/server.mjs` の絶対パスを指定します。[MCP の設定とツール例（中国語）](mcp/README.md) · [素材選択の Skill](.agents/skills/posewear/SKILL.md)
-
-お気に入り、スタジオの下書き、API キーはブラウザーの localStorage、生成履歴は IndexedDB に保存されます。サイトのブラウザーデータを消去すると、これらの内容も削除されます。
-
-## 開発とテスト
-
-フロントエンドは素の JS、HTML、CSS で、Python が静的サイトをビルドします。生成用のプロキシには Cloudflare Pages Function を使えます。画面の開発には `npm start` を使用します。原画からの完全なビルドには Python 3.9 以降、Pillow、元画像、拡張素材アーカイブが必要です。
-
-`npx playwright install chromium` でテスト用ブラウザーをインストールし、`npm run test:offline` でフィクスチャを使うテストを実行できます。全回帰テストを実行する場合は、開発手順に従ってステージングの Pages サーバーを起動し、リポジトリのルートで `U=http://127.0.0.1:8902 npm test` を実行します。ブラウザーテストは画像生成サービスの応答を模擬します。[素材準備、ビルドとテスト手順（中国語）](AGENTS.md)
-
-**v1.3.0（2026-11-24）** 対応する線画と深度画像の切り替え、スタジオを開いたままの素材選択、素材単体またはプロンプトだけでの生成に対応しました。参考画像リンク付きコピー、3 言語の UI、ローカルエンジン、MCP も利用できます。[リリースノート](https://github.com/atuizz/posewear/releases/tag/v1.3.0) · [更新履歴](CHANGELOG.md#ja)
-
-## ライセンスと謝辞
-
-コード、画面の文言、ビルドスクリプトには [MIT ライセンス](LICENSE) が適用されます。スクリーンショット内の画像を含め、素材にはそれぞれの提供元の利用条件が適用されます。セルフホストの際は出典と作者名を残してください。
-
-| 素材 | 出典と利用条件 |
-| --- | --- |
-| ポーズ、深度画像、衣装、アニメ衣装 | ギア / @giaaibusi。商用利用、転載、再配布については作者にご確認ください。リポジトリには深度画像の日本語メタデータと本サイトの中国語訳を収録し、画像は素材 CDN から配信しています。[線画](https://ai-pose-gallery.pages.dev/) · [深度画像](https://ai-pose-depth-gallery.pages.dev/) · [衣装](https://ai-costume-gallery.pages.dev/) · [アニメ衣装](https://ai-costume-anime-gallery.pages.dev/) |
-| 人物 | @agi_aibusi による架空の AI ポートレート、CC0。作者は原画の一括転載を控えるよう希望しています。[AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) |
-| 髪型・一部のアニメ衣装 | たき AI / CharaDB。タグは CC0。画像の権利は作者に帰属し、提供元から直接読み込みます。[CharaDB](https://charadb-2fi.pages.dev/) |
-| 表情 | WaveSpeed AI Emotion Gallery。ICT Face Model Light を使用（© USC Institute for Creative Technologies、MIT）。 |
-| 歴代衣装、背景、照明、小物、家具 | Shisei / wquguru、CC0 1.0。 |
-
-着想をいただいた二つのオープンソースプロジェクトに感謝します。[gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) · [nvzhuang](https://github.com/paipiange/nvzhuang)
+インスピレーションをくれた [gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) と [nvzhuang](https://github.com/paipiange/nvzhuang) に感謝します。

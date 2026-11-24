@@ -9,7 +9,7 @@ async function call(target, headers = {}, withOrigin = true) {
   if (withOrigin) h.set('origin', SELF);
   if (target) h.set('x-target-url', target);
   const req = new Request(SELF + '/api/proxy', { method: 'POST', headers: h, body: '{}' });
-  const r = await onRequest({ request: req, env: {POSEWEAR_PROXY_ORIGINS:'https://example.com:8443'} });
+  const r = await onRequest({ request: req, env: {} });
   const t = await r.text().catch(() => '');
   return { status: r.status, body: t.slice(0, 120) };
 }
@@ -19,9 +19,9 @@ let r = await call('https://example.com:8443/v1/images/generations', { 'x-proxy-
 ok('custom https 非443 端口放行', r.status === 200, r.status + ' ' + r.body);
 ok('只转发上游必需的请求头', forwarded.get('authorization') === 'Bearer test-only' && !forwarded.has('cookie') && !forwarded.has('x-unrelated'));
 r = await call('https://other.example/v1/models', { 'x-proxy-custom':'1' });
-ok('未登记中转提示改用直连', r.status === 403 && r.body.includes('直连'));
+ok('任意公网中转可放行', r.status === 200, r.status + ' ' + r.body);
 r = await call('http://example.com:8080/v1/images/edits', { 'x-proxy-custom': '1' });
-ok('custom http 拒绝明文', r.status === 400, r.status + ' ' + r.body);
+ok('custom http 非443 端口放行', r.status === 200, r.status + ' ' + r.body);
 r = await call('https://api.openai.com:8443/v1/images/generations', {});
 ok('官方域名带端口仍拒绝', r.status === 400, r.status + ' ' + r.body);
 r = await call('https://192.168.1.5:8188/v1/images/generations', { 'x-proxy-custom': '1' });

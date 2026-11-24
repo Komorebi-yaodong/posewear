@@ -79,7 +79,7 @@ window.PoseWearImageProviders = (() => {
   }
 
   const statusMessages = {
-    400: '请求参数有误：常见原因是模型不支持参考图、画幅尺寸不对或图片格式不支持，可换个模型或画幅再试',
+    400: '请求参数有误：模型、画幅或图片格式可能不受支持',
     401: '密钥无效或已过期，请检查 API Key',
     403: '没有权限：密钥无此模型权限、账户未验证，或所在地区不受支持',
     404: '地址或模型不存在：请检查 Base URL 和模型名',
@@ -90,7 +90,7 @@ window.PoseWearImageProviders = (() => {
   };
 
   function apiError(reply, data, settings) {
-    const detail = data?.error?.message || data?.error?.status || data?.error || data?.message || reply.statusText;
+    const detail = data?.error?.message || data?.message || reply.statusText;
     const message = redact(typeof detail === 'string' ? detail : JSON.stringify(detail), settings.key);
     const requestId = data?.error?.request_id || reply.headers.get('x-request-id');
     const blocked = safetyError(message, data, requestId, settings.key);
@@ -103,7 +103,7 @@ window.PoseWearImageProviders = (() => {
     if (/API_KEY_INVALID|API key not valid|invalid api key|Incorrect API key|AuthenticationError|InvalidApiKey/i.test(message + ' ' + JSON.stringify(data))) {
       reason = statusMessages[401];
     } else if (unsupported) {
-      reason = '该服务商不支持 ' + unsupported[1] + ' 参数：当前接口协议与它的规格对不上，请检查「接口协议」设置（xAI 请改选 xAI 协议）';
+      reason = '该服务商不支持 ' + unsupported[1] + ' 参数，请检查「接口协议」设置';
     }
     const error = Error(message);
     error.status = reply.status;
@@ -125,7 +125,7 @@ window.PoseWearImageProviders = (() => {
     if (!reply.ok) {
       if (settings.prov === 'seedream' && reply.status === 404) {
         if (reply.headers.get('content-type')?.includes('text/html')) {
-          throw Error('本站代理未生效：/api/proxy 返回的是网站静态页面而不是接口响应，Seedream 暂时连不上，请稍后再试或联系站长');
+          throw Error('本站代理未生效（/api/proxy 返回了网页内容），请稍后再试或联系站长');
         }
         return '地址可达，方舟未提供模型列表。请通过生成验证密钥与模型。';
       }
@@ -173,18 +173,15 @@ window.PoseWearImageProviders = (() => {
     if (!image?.url) throw Error('服务商没有返回图片数据' + (data?.error?.message ? '：' + redact(data.error.message, job.settings.key) : ''));
     const { url } = image;
     let reply = await fetch(url, { signal: job.signal }).catch(() => null);
-    if (!reply?.ok) {
-      job.signal.throwIfAborted();
-      reply = await fetch('/api/proxy', {
-        signal: job.signal, headers: { 'x-target-url': url, 'x-proxy-kind': 'image' }
-      }).catch(() => null);
-    }
-    job.signal.throwIfAborted();
-    if (!reply?.ok) throw Error('结果图片无法在浏览器中下载，请直接打开：' + redact(url, job.settings.key));
+    if (!reply?.ok) reply = await fetch('/api/proxy', {
+      signal: job.signal, headers: { 'x-target-url': url, 'x-proxy-kind': 'image' }
+    }).catch(() => null);
+    if (!reply?.ok) throw Error('结果图片下载失败，请直接打开：' + redact(url, job.settings.key));
     return reply.blob();
   }
 
-  async function generateLocal({ images, prompt, ratio, checkpoint, signal }) {
+  async function generateLocal(job) {
+    const { images, prompt, ratio, checkpoint, signal } = job;
     const form = new FormData();
     form.set('prompt', prompt);
     if (checkpoint) form.set('checkpoint', checkpoint);
@@ -276,22 +273,10 @@ window.PoseWearImageProviders = (() => {
     try {
       return { blob: await edits(job, size, field) };
     } catch (error) {
-      if (error.name === 'AbortError' || error.safe || /Argument not supported/i.test(error.message)) throw error;
-      if (error.status === 400 && /image/i.test(error.message) && !/safety|moderation|reject/i.test(error.message)) {
-        const alternate = field === 'image[]' ? 'image' : 'image[]';
-        try {
-          return { blob: await edits(job, size, alternate), warn: '已自动改用另一种图片字段名重试成功。' };
-        } catch (retryError) {
-          if (retryError.name === 'AbortError' || retryError.safe || retryError.status !== 400) throw retryError;
-        }
-      }
-      if (![404, 405, 415, 501].includes(error.status) && !/edits|not supported|unsupported|no such|invalid url/i.test(error.message)) throw error;
-    }
-    try {
-      return { blob: await generations(job, { size }), warn: '该接口不支持 images/edits，已自动改用 images/generations（JSON 多图）。' };
-    } catch (error) {
-      if (error.safe || error.status !== 400) throw error;
-      return { blob: await generations(job, { size }, []), warn: textOnlyWarning };
+      // 只对「图片字段名不对」这一种已知情况换字段重试一次；其余错误直接报出，不静默换协议或丢参考图
+      if (error.name === 'AbortError' || error.safe || error.status !== 400 || !/image/i.test(error.message) || /safety|moderation|reject/i.test(error.message)) throw error;
+      const alternate = field === 'image[]' ? 'image' : 'image[]';
+      return { blob: await edits(job, size, alternate), warn: '已自动改用另一种图片字段名重试成功。' };
     }
   }
 

@@ -1,7 +1,7 @@
 import argparse,json,os,shutil,subprocess,depthpack
 from costume_text import gen2
 import hashlib,re,html as H
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from PIL import Image
 # 素材目录：默认 ./assets-raw，可用环境变量 POSEWEAR_RAW 指定（见 scripts/fetch-assets.py）
 R=os.environ.get('POSEWEAR_RAW','assets-raw'); D='dist'
@@ -40,8 +40,7 @@ cos=[{'id':d['id'],'cat':CC[d['カテゴリ']][0],'catEn':CC[d['カテゴリ']][
 acs=[{'id':d['id'],'cat':CC[d['カテゴリ']][0],'catEn':CC[d['カテゴリ']][1],'kw':d['キーワード'],**dict(zip(('zh','en','ti'),gen2(d['キーワード'],CC[d['カテゴリ']][1],d['id']))),'t':'a/t/'+os.path.basename(d['サムネ']),'m':'a/m/'+d['id']+'.webp','i':'a/i/'+os.path.basename(d['画像']),'o':'o/a/'+d['id']+'.png','_src':d} for d in ad]
 # 双人 分类人工复核（看图）
 FIX={'pair60_P031':'坐位','pair60_P053':'立位贴身','pair60_P055':'侧位','pair60_P058':'贴脸'}
-for k,v in FIX.items():
-  if k in poses: poses[k]['cat']=v
+for k,v in FIX.items(): poses[k]['cat']=v
 ADULT_LINES={'双人互动','全身·性感'};ADULT_CATS={'挤胸·乳沟','性感·大胆'};ADULT_COS={'内衣','性感'}
 for p in poses.values():
   if p['line'] in ADULT_LINES or p['cat'] in ADULT_CATS: p['a']=1
@@ -178,8 +177,8 @@ if os.path.exists(f'{AROOT}/p/t'):
   for f in os.listdir(f'{AROOT}/p/t'):
     if f.endswith('.jpg'): os.remove(f'{AROOT}/p/t/{f}')
 if AHOST:
-  open(f'{AD}/_headers','w').write('/*\n  Cache-Control: public, max-age=0, must-revalidate\n  Access-Control-Allow-Origin: *\n/o/*\n  Content-Disposition: attachment\n')
-with ThreadPoolExecutor(max_workers=min(os.cpu_count() or 1, 8)) as ex:
+  open(f'{AD}/_headers','w').write('/*\n  Cache-Control: public, max-age=31536000, immutable\n  Access-Control-Allow-Origin: *\n/o/*\n  Content-Disposition: attachment\n')
+with ProcessPoolExecutor() as ex:
   for convert, records in ((cv,pd),(cm,cd),(ca,ad),(cr,rd)):
     list(ex.map(convert,records))
 for _sub,_items in NEWMODS: _cnew(_sub,_items)

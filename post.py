@@ -95,7 +95,6 @@ _IMG=" ".join(["'self'","data:","blob:"]+list(DEPTH_ORIGINS)+list(HOTLINK_ORIGIN
 CSP=("default-src 'self'; script-src 'self' "+SH+(" https://static.cloudflareinsights.com" if WAT else "")+"; style-src 'self' 'unsafe-inline'; img-src "+_IMG+"; font-src 'self' data:; "
  "connect-src 'self' data: blob: https:; "
  "worker-src 'self'; manifest-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests")
-REVALIDATE='  Cache-Control: public, max-age=0, must-revalidate\n'
 IMM='  Cache-Control: public, max-age=31536000, immutable\n'
 # Pages Functions 必须位于部署目录内才会随 wrangler pages deploy 一起发布（曾因只传静态产物导致 /api/proxy 丢失，见 issue #7）
 if os.path.isdir('functions'):
@@ -110,17 +109,17 @@ open(f'{D}/_headers','w').write(f'''/*
   Cross-Origin-Opener-Policy: same-origin
 /assets/*
 {IMM}/p/*
-{REVALIDATE}/c/*
-{REVALIDATE}/a/*
-{REVALIDATE}/r/*
-{REVALIDATE}/e/*
-{REVALIDATE}/y/*
-{REVALIDATE}/s/*
-{REVALIDATE}/l/*
-{REVALIDATE}/t/*
-{REVALIDATE}/f/*
-{REVALIDATE}/o/*
-{REVALIDATE}/icon-*
+{IMM}/c/*
+{IMM}/a/*
+{IMM}/r/*
+{IMM}/e/*
+{IMM}/y/*
+{IMM}/s/*
+{IMM}/l/*
+{IMM}/t/*
+{IMM}/f/*
+{IMM}/o/*
+{IMM}/icon-*
   Cache-Control: public, max-age=86400
 /og.png
   Cache-Control: public, max-age=86400

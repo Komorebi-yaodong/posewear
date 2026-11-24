@@ -1,16 +1,53 @@
+<div align="center">
+
 # PoseWear
 
-[简体中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
+A place to find reference images for drawing, photography, and AI generation.
 
-Find visual references for drawing, photography and AI try-on. Pick a pose, flip it to the matching depth view and pair it with a portrait or outfit. Copy the prompt and image links into an agent, or generate an image in the studio.
+Twelve libraries — poses, outfits, portraits, expressions, and more — each with Chinese and English prompts.
+Pick your references and generate right in the browser, or hand the set to your AI agent.
 
-[Open the gallery](https://posewear.pages.dev/) · [Run locally](#run-locally) · [Connect an agent](mcp/README.md) · [Release notes](CHANGELOG.md#en)
+[Live site](https://posewear.pages.dev/) · [简体中文](README.md) · [日本語](README.ja.md) · [Changelog](CHANGELOG.md)
 
-![Outfit filters and reference cards in PoseWear](docs/home-en.jpg)
+> **Beware of impostors**: the only official site is [posewear.pages.dev](https://posewear.pages.dev/). There is no Windows or Android app, and we never offer exe or apk downloads. Sites such as posewear.cn are impostors — never enter your API key there.
 
-## Run locally
+![Outfit library](docs/home-en.jpg)
 
-Use Node.js 22.12 or later. The preview fetches the 12 public catalogs on first visit and loads images as you browse. If you downloaded the source ZIP, open the extracted project directory and start at `npm ci`.
+</div>
+
+## Finding references
+
+- **Poses come in pairs**: every pose has a line sketch and a depth map from the same camera angle. Flip between them on the card, or send both to generation together.
+- **A floating workspace collects as you browse**: tap + on any card to drop it into the tray at the bottom. Generate from the tray, or copy the whole set — prompts plus public image links.
+- **The full studio mixes freely**: a person, an outfit, poses, plus expressions, hair, scenes, lighting, props, and furniture. Use as many or as few as you like — a prompt alone works too. Upload your own photo to try outfits on.
+- Everything you generate is kept under History, ready to view, download, or export as ZIP.
+
+![Studio](docs/studio-en.jpg)
+
+<table><tr>
+<td width="30%"><img src="docs/mobile-en.jpg" alt="Browsing on a phone"><br><sub>Works on your phone, too</sub></td>
+<td><img src="docs/dark-en.jpg" alt="Dark mode"><br><sub>Dark mode, follows your system by default</sub></td>
+</tr></table>
+
+The interface speaks English, Chinese, and Japanese; reference descriptions switch between Chinese and English.
+
+## Three ways to generate
+
+**Your own API key** — Use OpenAI, Gemini, or Seedream keys, or any endpoint compatible with the OpenAI, Gemini, or xAI image protocols. Requests go straight from your browser, or through the site proxy (relays may use http/https and any port).
+
+**A model on your machine** — If you run ComfyUI or stable-diffusion.cpp, connect the local engine and generate without images leaving your computer. [Setup guide](docs/local-engines.md)
+
+**Your AI agent** — The repo ships an MCP server so an agent can search references, fetch a specific angle, and assemble prompts with image links:
+
+```sh
+codex mcp add posewear -- node "$PWD/mcp/server.mjs"
+```
+
+Then just ask: “Find a side-view sitting pose with a spring outfit — give me the prompt and reference links.” [MCP guide](mcp/README.md)
+
+## Run it locally
+
+Requires Node.js 22.12+:
 
 ```sh
 git clone https://github.com/atuizz/posewear.git
@@ -19,51 +56,26 @@ npm ci
 npm start
 ```
 
-Open the [local gallery](http://127.0.0.1:8787/). Browsing, saving favorites and copying references all work without an account or API key.
+Open http://127.0.0.1:8787/ . Browsing, favorites, and copying need no account or key. Catalogs load from the public site on first open; images load on demand.
 
-## From reference to image
+Favorites, settings, and API keys live only in your browser; generation history lives in the browser database. Clearing site data removes them.
 
-| Where | What you can do |
+## Development
+
+Vanilla JS, a Python build, and Cloudflare Pages — no framework. Build, assets, tests, and deployment are documented in [AGENTS.md](AGENTS.md); `npm test` runs the regression suite.
+
+Current release **v1.3.1** (2026-11-24): restores proxy forwarding for custom relays and long-term image caching. [All releases](CHANGELOG.md)
+
+## Sources and licenses
+
+Code, UI text, and build scripts are [MIT](LICENSE). Images belong to their sources — keep the credits if you self-host:
+
+| Material | Source |
 | --- | --- |
-| Gallery | Pick a camera angle at the foot of a pose card. Click the ID in the top left to flip to the corresponding depth map and back. Both sides of the same pose and angle can guide one generation. |
-| Floating studio | Use the plus on a card to collect references. Keep the studio open as you browse or switch collections. Copying a single or combined prompt includes public image links for your selected views by default. Attach any locally uploaded photos separately when sharing. |
-| Full studio | Pick any combination of person, outfit and pose. Open **Other references** for expressions, hairstyles, scenes, lighting, props or furniture. Use a single prop, start with text alone, or upload your photo for a before-and-after try-on. The studio remembers your edited prompt, image count and aspect ratio. |
-| Generation history | Revisit a result, download it or export the images, prompts and settings as a ZIP. Each browser keeps up to 200 records. |
+| Poses, depth poses, outfits, anime outfits | ギア / @giaaibusi — ask the author before commercial use or redistribution. [Sketches](https://ai-pose-gallery.pages.dev/) · [Depth](https://ai-pose-depth-gallery.pages.dev/) · [Outfits](https://ai-costume-gallery.pages.dev/) · [Anime outfits](https://ai-costume-anime-gallery.pages.dev/) |
+| Portraits | Fictional AI portraits by @agi_aibusi, CC0; the author asks that they not be reposted in bulk unchanged. [AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) |
+| Hair and some anime outfits | たき AI / CharaDB, tags CC0, images load from the source site. [CharaDB](https://charadb-2fi.pages.dev/) |
+| Expressions | WaveSpeed AI Emotion Gallery; head model ICT FaceKit (© USC Institute for Creative Technologies, MIT) |
+| Historical dress, scenes, lighting, props, furniture | Shisei / wquguru, CC0 1.0 |
 
-![Reference selection, board and generation controls in the studio](docs/studio-en.jpg)
-
-[See a try-on made from a portrait, outfit and pose](docs/banner.jpg)
-
-The collection menu groups all 12 libraries into **Movement**, **People**, **Wardrobe** and **Setting**. You can pick references on mobile, too. The globe menu controls the interface language (Chinese, English or Japanese), description language (Chinese or English) and whether to include reference links when copying. Appearance follows your system by default. Choose light or dark mode in the header, and open the bell for updates and recent actions.
-
-<table><tr><td width="28%" valign="top"><img src="docs/mobile-en.jpg" alt="PoseWear on a phone" width="100%"></td><td valign="top"><img src="docs/dark-en.jpg" alt="PoseWear in dark mode" width="100%"></td></tr></table>
-
-## Choose how to generate
-
-- **Cloud provider.** Enter your API key in the studio's provider settings. Use OpenAI, Gemini, Seedream or an HTTPS service compatible with the OpenAI, Gemini or xAI image protocol. Direct requests send the key, prompt and images to your provider. Enabling the proxy routes the same request through a Pages Function. Your provider sets pricing and quotas.
-- **Local model.** Start ComfyUI, select it in the local studio, test the connection and choose an installed checkpoint. The built-in workflow takes one reference image. Supply your own workflow for multiple images, or start the preview with `POSEWEAR_LOCAL_ENGINE=sd-cpp npm start` to connect a stable-diffusion.cpp `sd-server`. [Local engine setup (Chinese)](docs/local-engines.md)
-- **Agent.** From the repository root, run `codex mcp add posewear -- node "$PWD/mcp/server.mjs"` and start a new Codex session. Try “Find a side view of a seated pose, pair it with a spring outfit, and give me the prompt and both image links.” For another stdio client, use `node` as the command and the absolute path to `mcp/server.mjs` as its argument. [MCP configuration and tool examples (Chinese)](mcp/README.md) · [Reference selection skill](.agents/skills/posewear/SKILL.md)
-
-Favorites, studio drafts and API keys live in your browser's localStorage. Generated images and their settings live in IndexedDB. Clearing the site's browser data removes both.
-
-## Development and tests
-
-The frontend uses plain JS, HTML and CSS. Python builds the static site. A Cloudflare Pages Function serves as an optional generation proxy. Use `npm start` to develop the interface. A full build from the original assets also requires Python 3.9+, Pillow, the source images and the extension archives.
-
-Install the test browser with `npx playwright install chromium`, then run `npm run test:offline` for the fixture-based checks. For the full regression suite, start the staged Pages server as described in the handbook and run `U=http://127.0.0.1:8902 npm test` in the repository root. The browser tests mock image generation. [Asset preparation, builds and testing (Chinese)](AGENTS.md)
-
-**v1.3.0 (2026-11-24)** Flip between matched line and depth views, keep selecting references in the open studio, and generate from a single material or just a prompt. This update also adds copyable reference links, three UI languages, local engines and MCP support. [Release notes](https://github.com/atuizz/posewear/releases/tag/v1.3.0) · [Changelog](CHANGELOG.md#en)
-
-## License and credits
-
-The code, UI copy and build scripts are available under the [MIT License](LICENSE). Each reference image, including images visible in the screenshots, retains its source terms. Keep source and author credits on self-hosted copies.
-
-| Material | Source and terms |
-| --- | --- |
-| Poses, depth maps, outfits and anime outfits | By ギア / @giaaibusi. Contact the author about commercial use, reposting or redistribution. The repository includes Japanese depth metadata and PoseWear's Chinese names. Images are served by the asset CDN. [Line art](https://ai-pose-gallery.pages.dev/) · [Depth](https://ai-pose-depth-gallery.pages.dev/) · [Outfits](https://ai-costume-gallery.pages.dev/) · [Anime outfits](https://ai-costume-anime-gallery.pages.dev/) |
-| Portraits | Fictional AI portraits by @agi_aibusi, released under CC0. The author asks users to avoid bulk reposting the originals. [AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) |
-| Hairstyles and selected anime outfits | たき AI / CharaDB. Tags are CC0. Images belong to the author and are loaded directly from the original host. [CharaDB](https://charadb-2fi.pages.dev/) |
-| Expressions | WaveSpeed AI Emotion Gallery, using ICT Face Model Light (© USC Institute for Creative Technologies, MIT). |
-| Historical dress, scenes, lighting, props and furniture | Shisei / wquguru, CC0 1.0. |
-
-Thanks to two open-source projects that inspired this work. [gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) · [nvzhuang](https://github.com/paipiange/nvzhuang)
+Inspired by [gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) and [nvzhuang](https://github.com/paipiange/nvzhuang) — thank you.
