@@ -1,11 +1,22 @@
 <div align="center">
 
+<img src="docs/banner.jpg" alt="Portrait + pose + outfit = result" width="900">
+
+<sub>The result is an AI-generated example using a portrait, pose and outfit from the galleries as references. Source images belong to their authors; see Sources and licenses below.</sub>
+
+<img src="docs/logo.svg" width="72" alt="PoseWear">
+
 # PoseWear
 
 A place to find reference images for drawing, photography, and AI generation.
 
 Twelve libraries — poses, outfits, portraits, expressions, and more — each with Chinese and English prompts.
 Pick your references and generate right in the browser, or hand the set to your AI agent.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
+[![Live demo](https://img.shields.io/badge/demo-posewear.pages.dev-ff2442)](https://posewear.pages.dev)
+[![GitHub stars](https://img.shields.io/github/stars/atuizz/posewear?style=flat&color=black)](https://github.com/atuizz/posewear/stargazers)
 
 [Live site](https://posewear.pages.dev/) · [简体中文](README.md) · [日本語](README.ja.md) · [Changelog](CHANGELOG.md)
 

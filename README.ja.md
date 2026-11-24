@@ -1,11 +1,22 @@
 <div align="center">
 
+<img src="docs/banner.jpg" alt="人物 + ポーズ + 服装 = 成果物" width="900">
+
+<sub>成果物は、ギャラリーの人物・ポーズ・服装を参考に AI が生成した例です。素材画像の著作権は各作者に帰属します。下記の「素材の出典とライセンス」を参照してください。</sub>
+
+<img src="docs/logo.svg" width="72" alt="PoseWear">
+
 # 衣姿 PoseWear
 
 絵を描くとき、写真を撮るとき、AI で画像を作るときの参考素材を探す場所。
 
 ポーズ・衣装・人物・表情など 12 の素材集に、中英プロンプト付き。
 素材を選べばそのままブラウザで生成でき、組み合わせを AI エージェントに渡すこともできます。
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
+[![Live demo](https://img.shields.io/badge/demo-posewear.pages.dev-ff2442)](https://posewear.pages.dev)
+[![GitHub stars](https://img.shields.io/github/stars/atuizz/posewear?style=flat&color=black)](https://github.com/atuizz/posewear/stargazers)
 
 [オンライン版](https://posewear.pages.dev/) · [简体中文](README.md) · [English](README.en.md) · [更新履歴](CHANGELOG.md)
 
