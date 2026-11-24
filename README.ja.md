@@ -10,8 +10,7 @@
 
 絵を描くとき、写真を撮るとき、AI で画像を作るときの参考素材を探す場所。
 
-ポーズ・衣装・人物・表情など 12 の素材集に、中英プロンプト付き。
-素材を選べばそのままブラウザで生成でき、組み合わせを AI エージェントに渡すこともできます。
+ポーズ・衣装・人物・表情など 12 の素材集に、中英プロンプト付き。素材を選べばそのままブラウザで生成でき、組み合わせを AI エージェントに渡すこともできます。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
@@ -20,11 +19,12 @@
 
 [オンライン版](https://posewear.pages.dev/) · [简体中文](README.md) · [English](README.en.md) · [更新履歴](CHANGELOG.md)
 
+</div>
+
+> [!CAUTION]
 > **偽サイトにご注意**：公式の入口は [posewear.pages.dev](https://posewear.pages.dev/) と本リポジトリのみです。PoseWear に Windows / Android アプリはなく、ネットドライブ等でインストールパッケージを配布することもありません。posewear.cn など公式を名乗り exe / apk のダウンロードを提供するサイトはすべて偽物です。ダウンロードせず、API キーを入力しないでください。
 
-![衣装ライブラリ](docs/home-ja.jpg)
-
-</div>
+---
 
 ## 素材の探し方
 
@@ -36,25 +36,30 @@
 ![スタジオ](docs/studio-ja.jpg)
 
 <table><tr>
-<td width="30%"><img src="docs/mobile-ja.jpg" alt="スマートフォンでの閲覧"><br><sub>スマホでも素材探し</sub></td>
+<td width="33%"><img src="docs/home-ja.jpg" alt="ライブラリのトップ"><br><sub>12 の素材集、中英プロンプト付き</sub></td>
+<td width="33%"><img src="docs/mobile-ja.jpg" alt="スマートフォンでの閲覧"><br><sub>スマホでも素材探し</sub></td>
 <td><img src="docs/dark-ja.jpg" alt="ダークモード"><br><sub>ダークモード（初期設定はシステム連動）</sub></td>
 </tr></table>
 
 画面は日本語・中国語・英語の3言語対応。素材の説明は中国語と英語を切り替えられます。
 
+---
+
 ## 生成方法は3つから
 
-**自分の API キーで** — OpenAI、Gemini、豆包 Seedream のキー、または OpenAI / Gemini / xAI 互換の中継サービスを設定します。ブラウザから直接送るか、このサイトのプロキシ経由（http/https・任意ポート対応）で送れます。
-
-**この端末のモデルで** — ComfyUI や stable-diffusion.cpp を動かしているなら、ローカルエンジンに接続して生成できます。画像が端末の外に出ることはありません。[設定ガイド](docs/local-engines.md)
-
-**AI エージェントに任せる** — リポジトリには MCP サーバーが入っていて、エージェントが素材検索、角度指定の取得、プロンプトと参照リンクの組み立てを自分で行えます：
+| 方法 | 内容 |
+| --- | --- |
+| **自分の API キーで** | OpenAI、Gemini、豆包 Seedream のキー、または OpenAI / Gemini / xAI 互換の中継サービスをスタジオに設定。ブラウザから直接送るか、このサイトのプロキシ経由（http/https・任意ポート対応）で送れます。 |
+| **この端末のモデルで** | ComfyUI や stable-diffusion.cpp を動かしているなら、ローカルエンジンに接続して生成できます。画像が端末の外に出ることはありません。[設定ガイド](docs/local-engines.md) |
+| **AI エージェントに任せる** | リポジトリには MCP サーバーが入っていて、エージェントが素材検索、角度指定の取得、プロンプトと参照リンクの組み立てを自分で行えます。[MCP ガイド](mcp/README.md) |
 
 ```sh
 codex mcp add posewear -- node "$PWD/mcp/server.mjs"
 ```
 
-あとは「横向きの座りポーズに春服を合わせて、プロンプトと参考リンクをちょうだい」と頼むだけです。[MCP ガイド](mcp/README.md)
+あとは「横向きの座りポーズに春服を合わせて、プロンプトと参考リンクをちょうだい」と頼むだけです。
+
+---
 
 ## ローカルで動かす
 
@@ -71,11 +76,15 @@ http://127.0.0.1:8787/ を開いてください。閲覧・お気に入り・コ
 
 お気に入り・設定・API キーはお使いのブラウザ内にだけ保存され、生成履歴もブラウザのデータベースに保存されます。サイトデータを消せば一緒に消えます。
 
+---
+
 ## 開発
 
 素の JS と Python ビルド、Cloudflare Pages のみで、フレームワークは使っていません。ビルド・素材準備・テスト・デプロイの手順は [AGENTS.md](AGENTS.md) にまとめています。回帰テストは `npm test` です。
 
 現在のバージョンは **v1.3.1**（2026-11-24）：カスタム中継へのプロキシ転送と、画像の長期キャッシュを復旧しました。[全バージョン履歴](CHANGELOG.md)
+
+---
 
 ## 素材の出典とライセンス
 

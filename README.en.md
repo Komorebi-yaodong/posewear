@@ -10,8 +10,7 @@
 
 A place to find reference images for drawing, photography, and AI generation.
 
-Twelve libraries — poses, outfits, portraits, expressions, and more — each with Chinese and English prompts.
-Pick your references and generate right in the browser, or hand the set to your AI agent.
+Twelve libraries — poses, outfits, portraits, expressions, and more — each with Chinese and English prompts. Pick your references and generate right in the browser, or hand the set to your AI agent.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
@@ -20,11 +19,12 @@ Pick your references and generate right in the browser, or hand the set to your 
 
 [Live site](https://posewear.pages.dev/) · [简体中文](README.md) · [日本語](README.ja.md) · [Changelog](CHANGELOG.md)
 
+</div>
+
+> [!CAUTION]
 > **Beware of impostors**: official access is only via [posewear.pages.dev](https://posewear.pages.dev/) and this repository. PoseWear has no Windows or Android app, and is never distributed as an exe/apk through any file-sharing service. Sites such as posewear.cn claiming to be official are impersonators — do not download, and never enter an API key there.
 
-![Outfit library](docs/home-en.jpg)
-
-</div>
+---
 
 ## Finding references
 
@@ -36,25 +36,30 @@ Pick your references and generate right in the browser, or hand the set to your 
 ![Studio](docs/studio-en.jpg)
 
 <table><tr>
-<td width="30%"><img src="docs/mobile-en.jpg" alt="Browsing on a phone"><br><sub>Works on your phone, too</sub></td>
+<td width="33%"><img src="docs/home-en.jpg" alt="Library home"><br><sub>Twelve libraries, bilingual prompts</sub></td>
+<td width="33%"><img src="docs/mobile-en.jpg" alt="Browsing on a phone"><br><sub>Works on your phone, too</sub></td>
 <td><img src="docs/dark-en.jpg" alt="Dark mode"><br><sub>Dark mode, follows your system by default</sub></td>
 </tr></table>
 
 The interface speaks English, Chinese, and Japanese; reference descriptions switch between Chinese and English.
 
+---
+
 ## Three ways to generate
 
-**Your own API key** — Use OpenAI, Gemini, or Seedream keys, or any endpoint compatible with the OpenAI, Gemini, or xAI image protocols. Requests go straight from your browser, or through the site proxy (relays may use http/https and any port).
-
-**A model on your machine** — If you run ComfyUI or stable-diffusion.cpp, connect the local engine and generate without images leaving your computer. [Setup guide](docs/local-engines.md)
-
-**Your AI agent** — The repo ships an MCP server so an agent can search references, fetch a specific angle, and assemble prompts with image links:
+| Way | How it works |
+| --- | --- |
+| **Your own API key** | Use OpenAI, Gemini, or Seedream keys in the studio, or any endpoint compatible with the OpenAI, Gemini, or xAI image protocols. Requests go straight from your browser, or through the site proxy (relays may use http/https and any port). |
+| **A model on your machine** | If you run ComfyUI or stable-diffusion.cpp, connect the local engine and generate without images leaving your computer. [Setup guide](docs/local-engines.md) |
+| **Your AI agent** | The repo ships an MCP server so an agent can search references, fetch a specific angle, and assemble prompts with image links. [MCP guide](mcp/README.md) |
 
 ```sh
 codex mcp add posewear -- node "$PWD/mcp/server.mjs"
 ```
 
-Then just ask: “Find a side-view sitting pose with a spring outfit — give me the prompt and reference links.” [MCP guide](mcp/README.md)
+Then just ask: “Find a side-view sitting pose with a spring outfit — give me the prompt and reference links.”
+
+---
 
 ## Run it locally
 
@@ -71,11 +76,15 @@ Open http://127.0.0.1:8787/ . Browsing, favorites, and copying need no account o
 
 Favorites, settings, and API keys live only in your browser; generation history lives in the browser database. Clearing site data removes them.
 
+---
+
 ## Development
 
 Vanilla JS, a Python build, and Cloudflare Pages — no framework. Build, assets, tests, and deployment are documented in [AGENTS.md](AGENTS.md); `npm test` runs the regression suite.
 
 Current release **v1.3.1** (2026-11-24): restores proxy forwarding for custom relays and long-term image caching. [All releases](CHANGELOG.md)
+
+---
 
 ## Sources and licenses
 

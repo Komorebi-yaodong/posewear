@@ -10,8 +10,7 @@
 
 给绘画、摄影和 AI 生图挑参考图的地方。
 
-姿势、服装、人像、表情等 12 个图库，配中英文提示词；
-选好素材就能在站内拼图生图，也可以把组合交给你的 AI 智能体。
+姿势、服装、人像、表情等 12 个图库，配中英文提示词；选好素材就能在站内拼图生图，也可以把组合交给你的 AI 智能体。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
@@ -20,11 +19,12 @@
 
 [在线图库](https://posewear.pages.dev/) · [English](README.en.md) · [日本語](README.ja.md) · [更新日志](CHANGELOG.md)
 
+</div>
+
+> [!CAUTION]
 > **谨防冒充**：官方入口只有 [posewear.pages.dev](https://posewear.pages.dev/) 和本仓库。PoseWear 没有 Windows / Android 客户端，也不在任何网盘分发安装包；以 posewear.cn 等域名冒充官网、提供 exe / apk 下载的均为假冒，请勿下载，更不要在其中填写 API Key。
 
-![服装库](docs/home.jpg)
-
-</div>
+---
 
 ## 挑图
 
@@ -36,25 +36,30 @@
 ![工作台](docs/studio.jpg)
 
 <table><tr>
-<td width="30%"><img src="docs/mobile.jpg" alt="手机上浏览"><br><sub>手机上也能选图</sub></td>
+<td width="33%"><img src="docs/home.jpg" alt="图库首页"><br><sub>12 个图库，中英文提示词</sub></td>
+<td width="33%"><img src="docs/mobile.jpg" alt="手机上浏览"><br><sub>手机上也能选图</sub></td>
 <td><img src="docs/dark.jpg" alt="深色模式"><br><sub>深色模式，默认跟随系统</sub></td>
 </tr></table>
 
 界面有中文、英文、日文三语，素材描述可在中英文之间切换。
 
+---
+
 ## 生图走哪条路，随你
 
-**用自己的 API Key** — 在工作台里填 OpenAI、Gemini、豆包 Seedream 的密钥，或任何兼容 OpenAI / Gemini / xAI 协议的中转。浏览器直连，或经本站代理转发（中转支持 http/https 和任意端口）。
-
-**用本机模型** — 装了 ComfyUI 或 stable-diffusion.cpp 的话，连本机引擎生图，图片不出这台电脑。[配置说明](docs/local-engines.md)
-
-**交给智能体** — 仓库带一个 MCP 服务，智能体能自己搜素材、按角度取图、拼好提示词和参考图链接：
+| 方式 | 怎么回事 |
+| --- | --- |
+| **云端 API Key** | 在工作台里填 OpenAI、Gemini、豆包 Seedream 的密钥，或任何兼容 OpenAI / Gemini / xAI 协议的中转。浏览器直连，或经本站代理转发（中转支持 http/https 和任意端口）。 |
+| **本机引擎** | 装了 ComfyUI 或 stable-diffusion.cpp 的话，连本机引擎生图，图片不出这台电脑。[配置说明](docs/local-engines.md) |
+| **MCP 智能体** | 仓库带一个 MCP 服务，智能体能自己搜素材、按角度取图、拼好提示词和参考图链接。[MCP 说明](mcp/README.md) |
 
 ```sh
 codex mcp add posewear -- node "$PWD/mcp/server.mjs"
 ```
 
-然后直接跟它说：「找一个侧面的坐姿，配一套春装，给我提示词和参考图。」[MCP 说明](mcp/README.md)
+接好之后直接跟它说：「找一个侧面的坐姿，配一套春装，给我提示词和参考图。」
+
+---
 
 ## 本地跑起来
 
@@ -71,11 +76,15 @@ npm start
 
 收藏、设置和 API Key 只存在你自己的浏览器里，生成记录存在浏览器数据库里，清站点数据即删。
 
+---
+
 ## 开发
 
 原生 JS + Python 构建 + Cloudflare Pages，没有框架。构建、素材准备、测试和部署流程都在 [AGENTS.md](AGENTS.md) 里，`npm test` 跑回归。
 
 当前版本 **v1.3.1**（2026-11-24）：修复本站代理对自定义中转的转发，并恢复图片长期缓存。[全部版本记录](CHANGELOG.md)
+
+---
 
 ## 素材来源与许可
 
