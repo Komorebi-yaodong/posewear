@@ -6,6 +6,10 @@
 
 ## 简体中文
 
+### 2026-11-24 · v1.3.2
+
+- 官方声明扩围：冒充名单新增 posewear.art（克隆本站并设登录与收费套餐）。重申：官方只有 posewear.pages.dev，免费、无需注册账号、没有收费套餐；凡是要登录、付费的「PoseWear」都是冒充。
+
 ### 2026-11-24 · v1.3.1
 
 - 官方声明：官网只有 posewear.pages.dev，没有 Windows / Android 客户端，也不提供 exe、apk 下载；posewear.cn 等站点均为冒充。声明已同步到三语 README 与站内通知区。
@@ -65,6 +69,10 @@
 
 ## English
 
+### 2026-11-24 · v1.3.2
+
+- Impersonation notice expanded: posewear.art (a clone with sign-in and paid plans) is now named too. The only official site is posewear.pages.dev — free, with no accounts and no paid plans; any "PoseWear" asking you to sign in or pay is an impostor.
+
 ### 2026-11-24 · v1.3.1
 
 - Fixes two v1.3.0 regressions: the site proxy again forwards to any public custom relay (http/https, any port, private addresses excluded) instead of requiring per-endpoint registration, and gallery images are back to one-year immutable caching instead of revalidating on every visit.
@@ -122,6 +130,10 @@
 <a id="ja"></a>
 
 ## 日本語
+
+### 2026-11-24 · v1.3.2
+
+- 偽サイト声明を拡充：posewear.art（ログインと有料プラン付きのクローン）を追加。公式は posewear.pages.dev のみ、無料でアカウントも有料プランもありません。ログインや支払いを求める「PoseWear」はすべて偽物です。
 
 ### 2026-11-24 · v1.3.1
 

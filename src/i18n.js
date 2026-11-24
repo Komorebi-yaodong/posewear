@@ -21,7 +21,7 @@
     'ComfyUI 中还没有可用的 checkpoint':['No checkpoints are available in ComfyUI yet.','ComfyUI に利用可能なモデルがありません。'],
     '通知': ['Notifications','お知らせ'], '姿态': ['Movement','動作'], '人物造型': ['People','人物・髪型'],
     '安全提醒':['Security notice','セキュリティのお知らせ'],
-    '唯一官网是 posewear.pages.dev。本项目没有 Windows / Android 客户端，冒充官网提供 exe / apk 下载的站点（如 posewear.cn）与本项目无关，请勿下载或在其中填写 API Key。':['The only official site is posewear.pages.dev. PoseWear has no Windows or Android app. Sites impersonating the official site and offering exe / apk downloads (such as posewear.cn) are unaffiliated — do not download from them or enter your API key there.','公式サイトは posewear.pages.dev のみです。本プロジェクトに Windows / Android アプリはありません。公式を装い exe / apk のダウンロードを提供するサイト（posewear.cn など）は本プロジェクトとは無関係です。ダウンロードしたり、API キーを入力したりしないでください。'],
+    '唯一官网是 posewear.pages.dev，免费、无需注册账号、没有收费套餐。本项目没有 Windows / Android 客户端；冒充官网提供 exe / apk 下载、或要求登录付费的站点（如 posewear.cn、posewear.art）与本项目无关，请勿下载、登录、付款或在其中填写 API Key。':['The only official site is posewear.pages.dev — free, with no accounts and no paid plans. PoseWear has no Windows or Android app. Sites impersonating the official site that offer exe / apk downloads or ask you to sign in or pay (such as posewear.cn and posewear.art) are unaffiliated — do not download from them, sign in, pay, or enter your API key there.','公式サイトは posewear.pages.dev のみです。無料で、アカウント登録も有料プランもありません。本プロジェクトに Windows / Android アプリはありません。公式を装い exe / apk のダウンロードを提供したり、ログインや支払いを求めたりするサイト（posewear.cn、posewear.art など）は本プロジェクトとは無関係です。ダウンロード、ログイン、支払い、API キーの入力をしないでください。'],
     '服饰': ['Wardrobe','衣類'], '环境与物件': ['Setting','空間・小物'], '素材库': ['Libraries','素材集'], '我的': ['Saved','マイページ'],
     '工作台': ['Studio','スタジオ'],
     '深度图': ['Depth map','深度画像'],

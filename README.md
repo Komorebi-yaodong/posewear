@@ -22,7 +22,7 @@
 </div>
 
 > [!CAUTION]
-> **谨防冒充**：官方入口只有 [posewear.pages.dev](https://posewear.pages.dev/) 和本仓库。PoseWear 没有 Windows / Android 客户端，也不在任何网盘分发安装包；以 posewear.cn 等域名冒充官网、提供 exe / apk 下载的均为假冒，请勿下载，更不要在其中填写 API Key。
+> **谨防冒充**：官方入口只有 [posewear.pages.dev](https://posewear.pages.dev/) 和本仓库，免费、无需注册账号、没有收费套餐。PoseWear 没有 Windows / Android 客户端，也不在任何网盘分发安装包；以 posewear.cn、posewear.art 等域名冒充官网、提供 exe / apk 下载或要求登录付费的均为假冒，请勿下载、登录或付款，更不要在其中填写 API Key。
 
 ---
 
@@ -82,7 +82,7 @@ npm start
 
 原生 JS + Python 构建 + Cloudflare Pages，没有框架。构建、素材准备、测试和部署流程都在 [AGENTS.md](AGENTS.md) 里，`npm test` 跑回归。
 
-当前版本 **v1.3.1**（2026-11-24）：修复本站代理对自定义中转的转发，并恢复图片长期缓存。[全部版本记录](CHANGELOG.md)
+当前版本 **v1.3.2**（2026-11-24）：冒充声明扩围，新增 posewear.art；官方站免费、无账号、无收费套餐。[全部版本记录](CHANGELOG.md)
 
 ---
 

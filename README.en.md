@@ -22,7 +22,7 @@ Twelve libraries — poses, outfits, portraits, expressions, and more — each w
 </div>
 
 > [!CAUTION]
-> **Beware of impostors**: official access is only via [posewear.pages.dev](https://posewear.pages.dev/) and this repository. PoseWear has no Windows or Android app, and is never distributed as an exe/apk through any file-sharing service. Sites such as posewear.cn claiming to be official are impersonators — do not download, and never enter an API key there.
+> **Beware of impostors**: official access is only via [posewear.pages.dev](https://posewear.pages.dev/) and this repository — free, with no accounts and no paid plans. PoseWear has no Windows or Android app, and is never distributed as an exe/apk through any file-sharing service. Sites such as posewear.cn and posewear.art claiming to be official, offering exe/apk downloads, or asking you to sign in or pay are impersonators — do not download, sign in, pay, or enter an API key there.
 
 ---
 
@@ -82,7 +82,7 @@ Favorites, settings, and API keys live only in your browser; generation history 
 
 Vanilla JS, a Python build, and Cloudflare Pages — no framework. Build, assets, tests, and deployment are documented in [AGENTS.md](AGENTS.md); `npm test` runs the regression suite.
 
-Current release **v1.3.1** (2026-11-24): restores proxy forwarding for custom relays and long-term image caching. [All releases](CHANGELOG.md)
+Current release **v1.3.2** (2026-11-24): the impersonation notice now also names posewear.art; the official site is free, with no accounts and no paid plans. [All releases](CHANGELOG.md)
 
 ---
 
