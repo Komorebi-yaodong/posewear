@@ -88,7 +88,7 @@ Current release **v1.3.2** (2026-11-24): the impersonation notice now also names
 
 ## Sources and licenses
 
-Code, UI text, and build scripts are [MIT](LICENSE). Self-hosting and derivative works are welcome — just don’t pass yourself off as the official project, and don’t publish sites or “clients” under the PoseWear name. Images belong to their sources — keep the credits if you self-host:
+Code, UI text, and build scripts are [MIT](LICENSE). Self-host, fork, package it as a client, even run it commercially — all fine. One condition: don’t use the PoseWear name and don’t pass yourself off as the official project; just credit the source. Note that image licenses are separate from the code license: some upstream galleries below don’t allow commercial use or redistribution, so clear rights with the original authors before any commercial use, at your own risk. Image sources:
 
 | Material | Source |
 | --- | --- |
