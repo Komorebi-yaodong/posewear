@@ -9,7 +9,7 @@
 
 [在线图库](https://posewear.pages.dev/) · [English](README.en.md) · [日本語](README.ja.md) · [更新日志](CHANGELOG.md)
 
-> **谨防冒充**：官网只有 [posewear.pages.dev](https://posewear.pages.dev/)，没有 Windows / Android 客户端，也不提供 exe、apk 下载。posewear.cn 等站点均为冒充，请勿在其中填写 API Key。
+> **谨防冒充**：官方入口只有 [posewear.pages.dev](https://posewear.pages.dev/) 和本仓库。PoseWear 没有 Windows / Android 客户端，也不在任何网盘分发安装包；以 posewear.cn 等域名冒充官网、提供 exe / apk 下载的均为假冒，请勿下载，更不要在其中填写 API Key。
 
 ![服装库](docs/home.jpg)
 

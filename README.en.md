@@ -9,7 +9,7 @@ Pick your references and generate right in the browser, or hand the set to your 
 
 [Live site](https://posewear.pages.dev/) · [简体中文](README.md) · [日本語](README.ja.md) · [Changelog](CHANGELOG.md)
 
-> **Beware of impostors**: the only official site is [posewear.pages.dev](https://posewear.pages.dev/). There is no Windows or Android app, and we never offer exe or apk downloads. Sites such as posewear.cn are impostors — never enter your API key there.
+> **Beware of impostors**: official access is only via [posewear.pages.dev](https://posewear.pages.dev/) and this repository. PoseWear has no Windows or Android app, and is never distributed as an exe/apk through any file-sharing service. Sites such as posewear.cn claiming to be official are impersonators — do not download, and never enter an API key there.
 
 ![Outfit library](docs/home-en.jpg)
 

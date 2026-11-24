@@ -9,7 +9,7 @@
 
 [オンライン版](https://posewear.pages.dev/) · [简体中文](README.md) · [English](README.en.md) · [更新履歴](CHANGELOG.md)
 
-> **偽サイトにご注意**：公式サイトは [posewear.pages.dev](https://posewear.pages.dev/) のみです。Windows / Android アプリはなく、exe や apk のダウンロードも提供していません。posewear.cn などは偽サイトです。API キーを入力しないでください。
+> **偽サイトにご注意**：公式の入口は [posewear.pages.dev](https://posewear.pages.dev/) と本リポジトリのみです。PoseWear に Windows / Android アプリはなく、ネットドライブ等でインストールパッケージを配布することもありません。posewear.cn など公式を名乗り exe / apk のダウンロードを提供するサイトはすべて偽物です。ダウンロードせず、API キーを入力しないでください。
 
 ![衣装ライブラリ](docs/home-ja.jpg)
 
