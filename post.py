@@ -13,22 +13,27 @@ def put(name,data):
   base,ext=name.rsplit('.',1);n=f'assets/{base}.{h8(b)}.{ext}';open(f'{D}/{n}','wb').write(b);A[name]=n;return n
 put('poses.json',PJ);put('costumes.json',CJ);put('anime.json',AJ);put('portraits.json',RJ);put('depths.json',DJ)
 put('expressions.json',EXJ);put('hair.json',HAJ);put('dynasties.json',DYJ);put('scenes.json',SCJ);put('lights.json',LIJ);put('props.json',PRJ);put('furniture.json',FUJ)
-for f in ['style.css','zip.js','extras.js','studio.js','history.js']: put(f,open(f'src/{f}','rb').read())
+CLIENT_FILES = ['theme.js','style.css','app.js','zip.js','extras.js','image-providers.js','studio.js','history.js','i18n.js','references.js']
+for f in CLIENT_FILES:
+  if f != 'app.js': put(f,open(f'src/{f}','rb').read())
 app=open('src/app.js').read()
-if AH: app=app.replace("const AH='';",f"const AH='{AH}/';")
-app=app.replace("'poses.json'","'/"+A['poses.json']+"'").replace("'costumes.json'","'/"+A['costumes.json']+"'").replace("'anime.json'","'/"+A['anime.json']+"'").replace("'portraits.json'","'/"+A['portraits.json']+"'").replace("'depths.json'","'/"+A['depths.json']+"'").replace("'expressions.json'","'/"+A['expressions.json']+"'").replace("'hair.json'","'/"+A['hair.json']+"'").replace("'dynasties.json'","'/"+A['dynasties.json']+"'").replace("'scenes.json'","'/"+A['scenes.json']+"'").replace("'lights.json'","'/"+A['lights.json']+"'").replace("'props.json'","'/"+A['props.json']+"'").replace("'furniture.json'","'/"+A['furniture.json']+"'")
+if AH: app=app.replace("const AH='';","const AH="+repr(AH+'/')+";")
+for name, asset in A.items():
+  if name.endswith('.json'): app=app.replace(repr(name),repr('/'+asset))
 put('app.js',app)
-VER='posewear-v10-'+h8(''.join(A.values()))
 idx=open('src/index.html').read()
-for f in ['style.css','app.js','zip.js','extras.js','studio.js','history.js']:
+for f in CLIENT_FILES:
   idx=idx.replace(f'"{f}"',f'"/{A[f]}"')
 idx=idx.replace('href="poses.json"',f'href="/{A["poses.json"]}"')
 if WAT: idx=idx.replace('</body>',f'<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{{"token": "{WAT}"}}\'></script></body>')
 open(f'{D}/index.html','w').write(idx)
-for f in ['style.css','app.js','zip.js','extras.js','studio.js','history.js']:
+for f in CLIENT_FILES:
   if os.path.exists(f'{D}/{f}'): os.remove(f'{D}/{f}')
-sw=open('src/sw.js').read().replace("const V='posewear-v9'",f"const V='{VER}'")
-sw=sw.replace("['./','index.html','style.css','app.js','studio.js','extras.js','zip.js','history.js','favicon.svg']",json.dumps(['/','/favicon.svg']+['/'+A[f] for f in ['style.css','app.js','studio.js','extras.js','zip.js','history.js','poses.json','depths.json']]))
+sw=open('src/sw.js').read()
+version = 'posewear-' + h8(sw + idx + ''.join(A.values()))
+sw=sw.replace("'posewear-development'",repr(version))
+precache = ['/','/favicon.svg']+['/'+A[f] for f in CLIENT_FILES+['poses.json','depths.json']]
+sw=re.sub(r'const PRECACHE = .*?;', 'const PRECACHE = '+json.dumps(precache)+';', sw, count=1)
 open(f'{D}/sw.js','w').write(sw)
 import base64
 inl=re.findall(r'<script>(.*?)</script>',idx,re.S)
@@ -36,20 +41,23 @@ SH=' '.join("'sha256-"+base64.b64encode(hashlib.sha256(x.encode()).digest()).dec
 # ---------- 静态详情页 ----------
 for d in ['pose','costume','anime','portrait']:
   if os.path.exists(f'{D}/{d}'): shutil.rmtree(f'{D}/{d}')
-CSS='''body{margin:0;font:15px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#111;background:#fff}a{color:inherit}
-header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid #f0f0f0}header a{text-decoration:none;font-weight:700;display:flex;align-items:center;gap:8px}
+THEME_HEAD = f'<meta name="theme-color" content="#ffffff"><script src="/{A["theme.js"]}"></script>'
+DARK_TOKENS = 'color-scheme:dark;--paper:#111;--ink:#eee;--muted:#aaa;--surface:#1d1d1d;--surface-hover:#292929;--edge:#333'
+CSS = (':root{color-scheme:light;--paper:#fff;--ink:#111;--muted:#606060;--surface:#f5f5f5;--surface-hover:#ececec;--edge:#ededed}'
+       ':root[data-theme="dark"]{' + DARK_TOKENS + '}'
+       '@media(prefers-color-scheme:dark){:root:not([data-theme]){' + DARK_TOKENS + '}}') + '''body{margin:0;font:15px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper)}a{color:inherit}
+header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--edge)}header a{text-decoration:none;font-weight:700;display:flex;align-items:center;gap:8px}
 .mk{width:26px;height:26px;color:#ff2442;display:grid;place-items:center}.mk svg{width:26px;height:26px}
 main{max-width:1040px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}
 @media(max-width:760px){main{grid-template-columns:1fr}}
-.im img{width:100%;height:auto;border-radius:16px;background:#f5f5f5;display:block}
-h1{font-size:24px;margin:0 0 6px}.mu{color:#666;font-size:13px}.bc{font-size:13px;color:#666;margin-bottom:12px}
-.box{background:#f5f5f5;border-radius:14px;padding:14px 16px;margin:14px 0}.box small{color:#666}
-.go{display:inline-block;background:#d81b3a;color:#fff;border-radius:999px;padding:10px 22px;text-decoration:none;font-weight:600;margin:6px 8px 6px 0}
-.rel{grid-column:1/-1}.rel ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.rel img{width:100%;height:auto;border-radius:10px;background:#f5f5f5;display:block}.rel a{text-decoration:none;font-size:13px}
-footer{text-align:center;color:#666;font-size:12px;padding:30px 20px;border-top:1px solid #f0f0f0}
+.im img{width:100%;height:auto;border-radius:16px;background:var(--surface);display:block}
+h1{font-size:24px;margin:0 0 6px}.mu{color:var(--muted);font-size:13px}.bc{font-size:13px;color:var(--muted);margin-bottom:12px}
+.box{background:var(--surface);border-radius:14px;padding:14px 16px;margin:14px 0}.box small{color:var(--muted)}
+.go{display:inline-block;background:#d81b3a;color:white;border-radius:999px;padding:10px 22px;text-decoration:none;font-weight:600;margin:6px 8px 6px 0}
+.rel{grid-column:1/-1}.rel ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.rel img{width:100%;height:auto;border-radius:10px;background:var(--surface);display:block}.rel a{text-decoration:none;font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px 20px;border-top:1px solid var(--edge)}
 h1{overflow-wrap:anywhere}
-@media(prefers-color-scheme:dark){body{color:#eee;background:#111}header,footer{border-color:#262626}.mu,.bc,.box small,footer{color:#9a9a9a}.box{background:#1d1d1d}.im img,.rel img{background:#1d1d1d}.go[style]{background:#eee!important;color:#111!important}}
-:root{color-scheme:light dark}'''
+.go.secondary{background:var(--ink);color:var(--paper)}'''
 LOGO='<span class="mk"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="6.6" r="4" fill="currentColor"/><path d="M16 13.4 3.4 25.6h25.2z" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"/></svg></span>'
 E=lambda s:H.escape(str(s),quote=True)
 def page(kind,it,rel):
@@ -71,22 +79,23 @@ def page(kind,it,rel):
   return f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(ttl)} | 衣姿 PoseWear</title><meta name="description" content="{E(desc[:150])}"><link rel="canonical" href="{url}">
 <meta property="og:type" content="article"><meta property="og:title" content="{E(ttl)}"><meta property="og:description" content="{E(desc[:150])}"><meta property="og:image" content="{SITE}/{img}"><meta property="og:url" content="{url}"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>{CSS}</style>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">{THEME_HEAD}<style>{CSS}</style>
 <script type="application/ld+json">{json.dumps(ld,ensure_ascii=False)}</script></head><body>
 <header><a href="/">{LOGO}衣姿 PoseWear</a></header>
 <main><div class="im"><img src="/{img}" alt="{E(ttl)}" width="{w}" height="{h}"></div>
 <div><div class="bc"><a href="/">首页</a> › <a href="/#{kind}">{lab}</a> › {E(it.get('cat') or it.get('len'))}</div><h1>{E(it['zh'] if P else it['ti'])}</h1><div class="mu">{E(meta)}</div>
 <div class="box"><small>中文描述</small><p>{E(desc)}</p></div><div class="box"><small>英文提示词 · PROMPT</small><p>{E(en)}</p></div>
-<a class="go" href="/#{kind}/{it['id']}">在衣姿中打开</a><a class="go" style="background:#111" href="/#studio">去试穿</a></div>
+<a class="go" href="/#{kind}/{it['id']}">在衣姿中打开</a><a class="go secondary" href="/#studio">去试穿</a></div>
 <section class="rel"><h2>同类{'姿势' if P else '穿搭' if kind=='costume' else '人像'}</h2><ul>{rl}</ul></section></main>
 <footer>{'图片来自 AI Portrait Gallery（作者 @agi_aibusi，CC0 1.0），AI 生成的虚构人物。' if kind=='portrait' else '图片来自 AI Pose Gallery / AI Costume Gallery（原作者 @giaaibusi）'}，中文描述由本站整理。<a href="/">返回首页</a></footer></body></html>'''
-open(f'{D}/404.html','w').write(f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>页面不存在 | 衣姿 PoseWear</title><meta name="robots" content="noindex"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>{CSS}
+open(f'{D}/404.html','w').write(f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>页面不存在 | 衣姿 PoseWear</title><meta name="robots" content="noindex"><link rel="icon" href="/favicon.svg" type="image/svg+xml">{THEME_HEAD}<style>{CSS}
 .nf{{max-width:480px;margin:12vh auto;text-align:center;padding:0 20px}}.nf b{{font-size:64px;color:#d81b3a;display:block;line-height:1}}</style></head><body><header><a href="/">{LOGO}衣姿 PoseWear</a></header>
-<div class="nf"><b>404</b><h1>这个页面不存在</h1><p class="mu">链接可能写错了，或者内容已经调整。</p><a class="go" href="/">回到首页</a><a class="go" style="background:#111" href="/#costume">看看服装库</a></div></body></html>''')
+<div class="nf"><b>404</b><h1>这个页面不存在</h1><p class="mu">链接可能写错了，或者内容已经调整。</p><a class="go" href="/">回到首页</a><a class="go secondary" href="/#costume">看看服装库</a></div></body></html>''')
 _IMG=" ".join(["'self'","data:","blob:"]+list(DEPTH_ORIGINS)+list(HOTLINK_ORIGINS)+([AH] if AH else []))
 CSP=("default-src 'self'; script-src 'self' "+SH+(" https://static.cloudflareinsights.com" if WAT else "")+"; style-src 'self' 'unsafe-inline'; img-src "+_IMG+"; font-src 'self' data:; "
- "connect-src 'self' data: blob: https://api.openai.com https://generativelanguage.googleapis.com https://*.volces.com https://*.bytepluses.com https://oaidalleapiprodscus.blob.core.windows.net https://*.googleusercontent.com"+(" "+" ".join(HOTLINK_ORIGINS) if HOTLINK_ORIGINS else "")+(" https://cloudflareinsights.com" if WAT else "")+"; "
+ "connect-src 'self' data: blob: https:; "
  "worker-src 'self'; manifest-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests")
+REVALIDATE='  Cache-Control: public, max-age=0, must-revalidate\n'
 IMM='  Cache-Control: public, max-age=31536000, immutable\n'
 # Pages Functions 必须位于部署目录内才会随 wrangler pages deploy 一起发布（曾因只传静态产物导致 /api/proxy 丢失，见 issue #7）
 if os.path.isdir('functions'):
@@ -101,17 +110,17 @@ open(f'{D}/_headers','w').write(f'''/*
   Cross-Origin-Opener-Policy: same-origin
 /assets/*
 {IMM}/p/*
-{IMM}/c/*
-{IMM}/a/*
-{IMM}/r/*
-{IMM}/e/*
-{IMM}/y/*
-{IMM}/s/*
-{IMM}/l/*
-{IMM}/t/*
-{IMM}/f/*
-{IMM}/o/*
-{IMM}/icon-*
+{REVALIDATE}/c/*
+{REVALIDATE}/a/*
+{REVALIDATE}/r/*
+{REVALIDATE}/e/*
+{REVALIDATE}/y/*
+{REVALIDATE}/s/*
+{REVALIDATE}/l/*
+{REVALIDATE}/t/*
+{REVALIDATE}/f/*
+{REVALIDATE}/o/*
+{REVALIDATE}/icon-*
   Cache-Control: public, max-age=86400
 /og.png
   Cache-Control: public, max-age=86400

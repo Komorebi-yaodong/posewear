@@ -6,11 +6,22 @@
   "scripts": {
     "build": "python3 build.py",
     "serve": "python3 -m http.server 8787 -d dist",
-    "test": "node tests/v12.js && node tests/v13.js",
-    "deploy": "wrangler pages deploy dist --project-name posewear --branch main"
+    "test": "node tests/run.mjs",
+    "deploy": "python3 tests/check_csp.py \"${POSEWEAR_STAGING:?Set POSEWEAR_STAGING to a fresh staging copy}\" && cd \"$POSEWEAR_STAGING\" && wrangler pages deploy . --project-name posewear --branch main",
+    "start": "node scripts/preview.mjs",
+    "mcp": "node mcp/server.mjs",
+    "test:offline": "node tests/run.mjs --offline"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
     "playwright": "^1.48.0",
     "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }
