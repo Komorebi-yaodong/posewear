@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare WaveSpeed expressions and public CharaDB hair for build.py."""
+"""Prepare WaveSpeed expressions and public CharaDB catalogs for build.py."""
 import json
 import os
 import re
@@ -95,7 +95,7 @@ def import_expressions(labels):
     print(f'WaveSpeed: {len(out)} expressions, {len(jobs)} source images', flush=True)
 
 
-def import_hair(labels):
+def fetch_charadb_items():
     js = fetch(f'{CHARADB}/data.js').decode('utf-8-sig')
     match = re.fullmatch(r'\s*window\.DB\s*=\s*(\{.*\})\s*;?\s*', js, re.S)
     if not match:
@@ -103,7 +103,11 @@ def import_hair(labels):
     data = json.loads(match[1])
     if data['tier'] != 'public':
         raise ValueError('CharaDB: expected public catalog')
-    items = [row for row in data['items'] if row.get('set') == 'hair' and row.get('tier') == 'public']
+    return [row for row in data['items'] if row.get('tier') == 'public']
+
+
+def import_hair(public_items, labels):
+    items = [row for row in public_items if row.get('set') == 'hair']
     children = defaultdict(list)
     for row in items:
         if not ID.fullmatch(row['id']):
@@ -138,10 +142,46 @@ def import_hair(labels):
     if not out:
         raise ValueError('CharaDB: no public hair entries')
     dump(RAW / 'charadb' / 'hair.json', out)
-    print(f'CharaDB: {len(out)} public entries (metadata only; images stay at source)', flush=True)
+    print(f'CharaDB: {len(out)} public hair entries (metadata only)', flush=True)
+
+
+OUTFIT_CATEGORIES = {
+    '制服・学生': '制服与校园风', 'カジュアル(春夏)': '春夏休闲', 'カジュアル(秋冬)': '秋冬休闲',
+    'きれいめ・オフィス': '通勤与职场', 'ドレス・パーティ': '礼服与派对', '和服': '和服',
+    '水着': '泳装', 'スポーツ・部活': '运动', '職業・コスプレ': '职业与角色扮演', 'ファンタジー': '奇幻',
+    '部屋着・パジャマ': '居家与睡衣', 'イベント・季節': '节庆与季节', 'アイドル・ステージ': '偶像与舞台',
+    'ゴスロリ・地雷系': '洛丽塔与地雷系', 'ミリタリー・SF': '军事与科幻',
+}
+
+
+def import_outfits(public_items, labels):
+    out, seen = [], set()
+    for row in public_items:
+        if row.get('set') != 'outfit':
+            continue
+        iid = row['id']
+        if not re.fullmatch(r'O[0-9]+', iid) or iid in seen:
+            raise ValueError(f'CharaDB: invalid or duplicate outfit ID: {iid}')
+        seen.add(iid)
+        name, tags = row['jp'], row['tags']
+        if not all(isinstance(v, str) and v.strip() for v in (name, tags)):
+            raise ValueError(f'CharaDB: missing outfit name or tags: {iid}')
+        cat = OUTFIT_CATEGORIES[row['cat']]
+        image = f'{CHARADB}/img/{iid}.jpg'
+        # Public availability does not imply that the image is appropriate for all ages.
+        # The public feed does not carry the curated archive's sensitivity flags.
+        out.append({'id': f'charadb-{iid}', 'cat': cat, 'catEn': labels['CATEN'][cat],
+                    'name': name, 'kw': tags, 'tagsZh': [name, cat], 'sens': True,
+                    't': f'{CHARADB}/thumb/{iid}.webp', 'm': image, 'i': image})
+    if not out:
+        raise ValueError('CharaDB: no public outfit entries')
+    dump(RAW / 'charadb' / 'outfits.json', out)
+    print(f'CharaDB: {len(out)} public outfit entries (metadata only)', flush=True)
 
 
 if __name__ == '__main__':
     labels = runpy.run_path(str(Path(__file__).with_name('prep-modules.py')))
-    import_hair(labels)
+    public_items = fetch_charadb_items()
+    import_hair(public_items, labels)
+    import_outfits(public_items, labels)
     import_expressions(labels)

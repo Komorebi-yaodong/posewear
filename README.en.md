@@ -2,127 +2,100 @@
 
 <img src="docs/banner.jpg" alt="Portrait + pose + outfit = result" width="900">
 
-<sub>The result is an AI-generated example using a portrait, pose and outfit from the galleries as references. Source images belong to their authors; see Acknowledgements.</sub>
+<sub>The result is an AI-generated example using a portrait, pose and outfit from the galleries as references. Source images belong to their authors; see Sources and licenses below.</sub>
 
 <img src="docs/logo.svg" width="72" alt="PoseWear">
 
-# PoseWear 衣姿
+# PoseWear
 
-Pose, outfit and portrait reference galleries with bilingual prompts, plus a bring-your-own-key AI try-on studio that runs in your browser.
+A place to find reference images for drawing, photography, and AI generation.
+
+Twelve libraries — poses, outfits, portraits, expressions, and more — each with Chinese and English prompts. Pick your references and generate right in the browser, or hand the set to your AI agent.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
 [![Live demo](https://img.shields.io/badge/demo-posewear.pages.dev-ff2442)](https://posewear.pages.dev)
 [![GitHub stars](https://img.shields.io/github/stars/atuizz/posewear?style=flat&color=black)](https://github.com/atuizz/posewear/stargazers)
 
-[Live demo](https://posewear.pages.dev) · [Features](#features) · [Quick start](#quick-start) · [Deploy](#deploy) · [FAQ](#faq) · [中文](README.md) · [日本語](README.ja.md)
-
-<img src="docs/home.jpg" alt="Home" width="900">
+[Live site](https://posewear.pages.dev/) · [简体中文](README.md) · [日本語](README.ja.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
-## Features
+> [!CAUTION]
+> **Beware of impostors**: official access is only via [posewear.pages.dev](https://posewear.pages.dev/) and this repository — free, with no accounts and no paid plans. PoseWear has no Windows or Android app, and is never distributed as an exe/apk through any file-sharing service. Sites such as posewear.cn and posewear.art claiming to be official, offering exe/apk downloads, or asking you to sign in or pay are impersonators — do not download, sign in, pay, or enter an API key there.
 
-- **Five galleries**: poses (multi-angle line sketches), depth poses (hotlinked depth maps), outfits (by season and type), anime outfits (anime-style looks), and portraits (face references, CC0). Every image has a Chinese description and an English prompt you can copy.
-- **Search and filters**: search in Chinese or English, filter by category, sort, or pick a random image. Each item has its own static page for sharing.
-- **Try-on studio**: upload a photo, pick an outfit and a pose, then generate. You can also generate without a photo. It supports several outputs per run, a before/after slider, and single or zip download.
-- **Generation history**: stored locally in IndexedDB. You can view, delete or clear items, and undo.
-- **Clear errors**: an invalid key, a rate limit, a timeout or a safety block each get their own message and a suggested next step.
-- **Reduce false safety blocks**: on by default. The studio rewrites its prompt into a neutral e-commerce try-on description without changing the outfit or pose. Turn it off to send the prompt as is.
-- Favorites, recent items and prompt combos, all stored locally; an 18+ toggle with age confirmation; PWA and offline support; dark mode; a Chinese/English UI.
+---
 
-### Providers
+## Finding references
 
-| Provider | You need | Default model | Notes |
-|---|---|---|---|
-| OpenAI | API key (gpt-image requires a verified org) | gpt-image-1 | images/edits with multiple references; strictest moderation |
-| Gemini | Google AI Studio key | gemini-2.5-flash-image | a.k.a. Nano Banana |
-| Doubao Seedream | Volcengine Ark key | doubao-seedream-4-0-250828 | routed through the site proxy by default for CORS |
-| Custom relay | Base URL, key and model | any | OpenAI-compatible; choose edits (multipart) or generations (JSON) |
+- **Poses come in pairs**: every pose has a line sketch and a depth map from the same camera angle. Flip between them on the card, or send both to generation together.
+- **A floating workspace collects as you browse**: tap + on any card to drop it into the tray at the bottom. Generate from the tray, or copy the whole set — prompts plus public image links.
+- **The full studio mixes freely**: a person, an outfit, poses, plus expressions, hair, scenes, lighting, props, and furniture. Use as many or as few as you like — a prompt alone works too. Upload your own photo to try outfits on.
+- Everything you generate is kept under History, ready to view, download, or export as ZIP.
 
-## Changelog
+![Studio](docs/studio-en.jpg)
 
-### 2026-11-19 · Anime outfits library
+<table><tr>
+<td width="33%"><img src="docs/home-en.jpg" alt="Library home"><br><sub>Twelve libraries, bilingual prompts</sub></td>
+<td width="33%"><img src="docs/mobile-en.jpg" alt="Browsing on a phone"><br><sub>Works on your phone, too</sub></td>
+<td><img src="docs/dark-en.jpg" alt="Dark mode"><br><sub>Dark mode, follows your system by default</sub></td>
+</tr></table>
 
-- New **Anime outfits** tab: 1,320 anime-style outfits from COSTUME-ANIME-DB by [@giaaibusi](https://x.com/giaaibusi), in the same 8 categories as the outfit library (spring 197 / summer 237 / autumn 230 / winter 232 / lingerie 197 / party 36 / swimwear 52 / sexy 139), each with Chinese and English prompts.
-- Lingerie and sexy categories (336 items) are treated as adult content: hidden by default behind the 18+ toggle (984 public items).
-- Anime outfits support the full outfit feature set: category / colour / item filters, search suggestions, favourites, recent views, prompt combos, bilingual detail pages and sitemap; the try-on studio can pick anime outfits directly from the garment step.
-- Homepage announcement bar and anime counts added; `scripts/fetch-assets.py` gains an `anime` source (and now also fetches the outfit thumbnails it used to miss).
+The interface speaks English, Chinese, and Japanese; reference descriptions switch between Chinese and English.
 
-### 2026-10-31 · Depth poses
+---
 
-- New **Depth poses** tab: 288 sets / 1,439 hotlinked depth-pose images; two-person images sit behind the 18+ toggle.
+## Three ways to generate
 
-## Screenshots
+| Way | How it works |
+| --- | --- |
+| **Your own API key** | Use OpenAI, Gemini, or Seedream keys in the studio, or any endpoint compatible with the OpenAI, Gemini, or xAI image protocols. Requests go straight from your browser, or through the site proxy (relays may use http/https and any port). |
+| **A model on your machine** | If you run ComfyUI or stable-diffusion.cpp, connect the local engine and generate without images leaving your computer. [Setup guide](docs/local-engines.md) |
+| **Your AI agent** | The repo ships an MCP server so an agent can search references, fetch a specific angle, and assemble prompts with image links. [MCP guide](mcp/README.md) |
 
-| Studio | Dark mode | Mobile |
-|:---:|:---:|:---:|
-| <img src="docs/studio.jpg" width="420" alt="Studio"> | <img src="docs/dark.jpg" width="420" alt="Dark mode"> | <img src="docs/mobile.jpg" width="180" alt="Mobile"> |
-
-## Quick start
-
-You need Python 3.9+ with Pillow. Tests and deploys also need Node.js 18+.
-
-```bash
-git clone https://github.com/atuizz/posewear.git && cd posewear
-pip install pillow
-python3 scripts/fetch-assets.py   # downloads data and images from the original galleries (several GB)
-python3 build.py                  # outputs dist/
-python3 -m http.server 8787 -d dist
+```sh
+codex mcp add posewear -- node "$PWD/mcp/server.mjs"
 ```
 
-Set `POSEWEAR_RAW` to use a different asset folder, and `POSEWEAR_SITE` to set your own site URL for the sitemap and share links.
+Then just ask: “Find a side-view sitting pose with a spring outfit — give me the prompt and reference links.”
 
-## Deploy
+---
 
-The repository ships without assets, so build locally first, then upload `dist/` to Cloudflare Pages:
+## Run it locally
 
-```bash
-npm install && npx wrangler login
-POSEWEAR_SITE=https://<project>.pages.dev python3 build.py
-npx wrangler pages deploy dist --project-name <project>
+Requires Node.js 22.12+:
+
+```sh
+git clone https://github.com/atuizz/posewear.git
+cd posewear
+npm ci
+npm start
 ```
 
-`functions/api/proxy.js` is deployed as a Pages Function that only forwards API requests. Adding a rate-limit rule for `/api/proxy` is recommended.
+Open http://127.0.0.1:8787/ . Browsing, favorites, and copying need no account or key. Catalogs load from the public site on first open; images load on demand.
 
-## Tests
+Favorites, settings, and API keys live only in your browser; generation history lives in the browser database. Clearing site data removes them.
 
-The Playwright tests mock every provider endpoint, so no real key is needed. They cover success, a bad key, rate limits, 5xx errors, timeouts, cancel, safety blocks and multiple outputs.
+---
 
-```bash
-npm install && npx playwright install chromium
-python3 -m http.server 8787 -d dist &
-node tests/v12.js && node tests/v13.js
-```
+## Development
 
-## FAQ
+Vanilla JS, a Python build, and Cloudflare Pages — no framework. Build, assets, tests, and deployment are documented in [AGENTS.md](AGENTS.md); `npm test` runs the regression suite.
 
-**Is my API key safe?** It stays in your browser's localStorage. Requests go straight to the provider. They only go through `/api/proxy` if you turn on proxy forwarding or use a custom relay; the proxy forwards requests as they are and never stores keys or images.
+Current release **v1.3.2** (2026-11-24): the impersonation notice now also names posewear.art; the official site is free, with no accounts and no paid plans. [All releases](CHANGELOG.md)
 
-**Why was my image blocked?** Providers moderate both the input photos and the output. Real photos with revealing outfits are the most likely to be blocked, and OpenAI is the strictest. The rewrite option reduces false positives on normal outfits. It does not bypass moderation of prohibited content.
+---
 
-**Can I use the images?** No images are included in this repo. All assets belong to their original authors, so check each source site's terms. The portrait gallery is CC0.
+## Sources and licenses
 
-## Contributing
+Code, UI text, and build scripts are [MIT](LICENSE). Self-host, fork, package it as a client, even run it commercially — all fine. One condition: don’t use the PoseWear name and don’t pass yourself off as the official project; just credit the source. Note that image licenses are separate from the code license: some upstream galleries below don’t allow commercial use or redistribution, so clear rights with the original authors before any commercial use, at your own risk. Image sources:
 
-Issues and PRs are welcome. Run `python3 build.py` and both test files before you open a PR, and add screenshots for UI changes. Please don't commit any assets or keys.
+| Material | Source |
+| --- | --- |
+| Poses, depth poses, outfits, anime outfits | ギア / @giaaibusi — ask the author before commercial use or redistribution. [Sketches](https://ai-pose-gallery.pages.dev/) · [Depth](https://ai-pose-depth-gallery.pages.dev/) · [Outfits](https://ai-costume-gallery.pages.dev/) · [Anime outfits](https://ai-costume-anime-gallery.pages.dev/) |
+| Portraits | Fictional AI portraits by @agi_aibusi, CC0; the author asks that they not be reposted in bulk unchanged. [AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) |
+| Hair and some anime outfits | たき AI / CharaDB, tags CC0, images load from the source site. [CharaDB](https://charadb-2fi.pages.dev/) |
+| Expressions | WaveSpeed AI Emotion Gallery; head model ICT FaceKit (© USC Institute for Creative Technologies, MIT) |
+| Historical dress, scenes, lighting, props, furniture | Shisei / wquguru, CC0 1.0 |
 
-## Acknowledgements
-
-[AI Pose Gallery](https://ai-pose-gallery.pages.dev/) · [AI Costume Gallery](https://ai-costume-gallery.pages.dev/) · [AI Costume Anime Gallery](https://ai-costume-anime-gallery.pages.dev/) by [@giaaibusi](https://x.com/giaaibusi) · [AI Pose Depth Gallery](https://ai-pose-depth-gallery.pages.dev/) by [ギア / @giaaibusi](https://x.com/giaaibusi) (hotlinked, unofficial Chinese index; images are not in this repo) · [AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/) by [@agi_aibusi](https://x.com/agi_aibusi) (CC0) · [wzc520pyfm/gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) · [paipiange/nvzhuang](https://github.com/paipiange/nvzhuang)
-
-## License and asset boundaries
-
-| What | In this repo? | License |
-|---|---|---|
-| Code, UI copy, build scripts | Yes | [MIT](LICENSE) |
-| Pose and outfit images and data | No — downloaded by `fetch-assets.py` | Owned by [@giaaibusi](https://x.com/giaaibusi) ([AI Pose Gallery](https://ai-pose-gallery.pages.dev/) / [AI Costume Gallery](https://ai-costume-gallery.pages.dev/) / [AI Costume Anime Gallery](https://ai-costume-anime-gallery.pages.dev/)); no open license is stated |
-| Portrait images | No — same as above | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) by [@agi_aibusi](https://x.com/agi_aibusi) ([AI Portrait Gallery](https://ai-portrait-gallery.pages.dev/)) |
-| Depth-pose images | No — hotlinked with `<img>` from [AI Pose Depth Gallery](https://ai-pose-depth-gallery.pages.dev/) | Owned by [ギア / @giaaibusi](https://x.com/giaaibusi). This repo only has the text metadata and Chinese names |
-| Depth-pose text metadata | Yes, `depth/packs/` | Japanese text belongs to the original author; Chinese names are ours |
-| README screenshots | Yes | The pictures shown belong to their authors as above |
-
-- MIT covers the code only, not any image or data.
-- To repost, use commercially or redistribute pose/outfit images, ask the author @giaaibusi first and follow the source site's terms.
-- Portraits are CC0: free to use, modify and sell without credit. They are AI-generated fictional people — don't use them to impersonate real people. The author asks that they not be bulk-reposted as-is.
-- If you deploy your own copy, keep the source and author credits on the pages.
+Inspired by [gen-ai-pose-image](https://github.com/wzc520pyfm/gen-ai-pose-image) and [nvzhuang](https://github.com/paipiange/nvzhuang) — thank you.
