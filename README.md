@@ -1,11 +1,22 @@
 <div align="center">
 
+<img src="docs/banner.jpg" alt="人像 + 姿势 + 服饰 = 成品" width="900">
+
+<sub>成品为用站内人像、姿势、服装作参考的 AI 生成示例；素材版权归原作者，见下文「素材来源与许可」。</sub>
+
+<img src="docs/logo.svg" width="72" alt="衣姿 PoseWear">
+
 # 衣姿 PoseWear
 
 给绘画、摄影和 AI 生图挑参考图的地方。
 
 姿势、服装、人像、表情等 12 个图库，配中英文提示词；
 选好素材就能在站内拼图生图，也可以把组合交给你的 AI 智能体。
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
+[![在线体验](https://img.shields.io/badge/demo-posewear.pages.dev-ff2442)](https://posewear.pages.dev)
+[![GitHub stars](https://img.shields.io/github/stars/atuizz/posewear?style=flat&color=black)](https://github.com/atuizz/posewear/stargazers)
 
 [在线图库](https://posewear.pages.dev/) · [English](README.en.md) · [日本語](README.ja.md) · [更新日志](CHANGELOG.md)
 
